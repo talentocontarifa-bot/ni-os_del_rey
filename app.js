@@ -74,6 +74,39 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.purple-header h2').innerHTML = '<i class="fa-solid fa-child-reaching"></i> Registro de Nuevo Niño';
     });
 
+    // Función para "despedazar" y comprimir imagen a Base64
+    function compressImageToBase64(file, maxWidth = 300, maxHeight = 300) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxWidth || height > maxHeight) {
+                        const ratio = Math.min(maxWidth / width, maxHeight / height);
+                        width = width * ratio;
+                        height = height * ratio;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Comprimir como JPEG al 70% de calidad
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.onerror = (e) => reject(e);
+            };
+            reader.onerror = (e) => reject(e);
+        });
+    }
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -95,11 +128,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let photoUrl = null;
             const file = photoInput.files[0];
 
-            // Si hay un archivo nuevo seleccionado, subimos
+            // "Despedazar la imagen": Comprimirla a Base64 sin usar Firebase Storage (Evita problemas de CORS)
             if (file) {
-                const fileRef = ref(storage, `niños/${Date.now()}_${file.name}`);
-                const snapshot = await uploadBytesResumable(fileRef, file);
-                photoUrl = await getDownloadURL(snapshot.ref);
+                photoUrl = await compressImageToBase64(file);
             }
 
             // Armamos el diccionario de actualización
