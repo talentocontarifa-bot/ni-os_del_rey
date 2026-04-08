@@ -160,13 +160,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 photoUrl = await compressImageToBase64(file);
             }
 
-            // Autogenerar ID si no tiene
+            // Autogenerar ID si no tiene (Formato secuencial NDR_01, NDR_02...)
             let autoId = null;
             if(currentEditId && kidsDataMap[currentEditId]) {
                 autoId = kidsDataMap[currentEditId].idAuto;
             }
             if(!autoId) {
-                autoId = 'NDR-' + Math.floor(1000 + Math.random() * 9000);
+                let maxNum = 0;
+                Object.values(kidsDataMap).forEach(kid => {
+                    if (kid.idAuto) {
+                        // Extraemos el número final sea NDR_05 o NDR-05
+                        const matchCounter = kid.idAuto.match(/\d+/);
+                        if (matchCounter) {
+                            const num = parseInt(matchCounter[0], 10);
+                            if (!isNaN(num) && num > maxNum) {
+                                maxNum = num;
+                            }
+                        }
+                    }
+                });
+                // PadStart asegura que empiece con 0 si es menor a 10 (ej. "01", "02")
+                autoId = 'NDR_' + String(maxNum + 1).padStart(2, '0');
             }
 
             // Armamos el diccionario de actualización
@@ -236,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if(group === 'Gpo 3') colorBar = '#FFD54F'; // Amarillito
                 else colorBar = '#CE93D8'; // Moradito por defecto
                 
-                let idText = childData.idAuto || 'NDR-????';
+                let idText = childData.idAuto || 'NDR_??';
                 let sisBroIcon = (childData.hermanosVinculados && childData.hermanosVinculados.length > 0) ? '<i class="fa-solid fa-children" style="color:#FF7043; margin-left:8px;" title="Tiene hermanos"></i>' : '';
 
                 const cardHtml = `
