@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niños del Rey - Sistema de Registro</title>
+    <!-- Google Fonts for the hand-drawn look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Colored Border Decoration -->
+        <div class="border-top-deco"></div>
+        <div class="border-left-deco"></div>
+        <div class="border-right-deco"></div>
+        <div class="border-bottom-deco"></div>
+
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo-container">
+                <img src="logo.webp" alt="Niños del Rey" class="main-logo">
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#" class="nav-item active" data-target="view-registro"><i class="fa-solid fa-user-plus"></i> Registro</a></li>
+                <li><a href="#" class="nav-item" data-target="view-directorio"><i class="fa-solid fa-address-book"></i> Directorio</a></li>
+                <li><a href="#" class="nav-item" data-target="view-asistencia"><i class="fa-solid fa-list-check"></i> Asistencia</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- View: Registro -->
+            <section id="view-registro" class="view active">
+                <header class="view-header purple-header">
+                    <h2><i class="fa-solid fa-child-reaching"></i> Registro de Nuevo Niño</h2>
+                </header>
+                
+                <form id="registro-form" class="sketchy-form">
+                    <div class="form-section">
+                        <h3><i class="fa-solid fa-id-card"></i> 1. Información Personal</h3>
+                        
+                        <div class="photo-upload-container">
+                            <div class="photo-preview sketchy-box" id="photo-preview">
+                                <i class="fa-solid fa-camera"></i>
+                                <span>Agregar Foto</span>
+                            </div>
+                            <input type="file" id="kid-photo" accept="image/*" style="display: none;">
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label>Nombre Completo</label>
+                                <input type="text" placeholder="Ej. Juan Pérez" required class="sketchy-input">
+                            </div>
+                            <div class="input-field">
+                                <label>Fecha de Nacimiento</label>
+                                <input type="date" required class="sketchy-input">
+                            </div>
+                            <div class="input-field radio-group">
+                                <label>Género</label>
+                                <div class="radio-options">
+                                    <label><input type="radio" name="gender" value="boy" checked> 👦 Niño</label>
+                                    <label><input type="radio" name="gender" value="girl"> 👧 Niña</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fa-solid fa-people-roof"></i> 2. Datos de los Padres/Tutores</h3>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label>Nombre del Tutor</label>
+                                <input type="text" placeholder="Ej. María López" class="sketchy-input">
+                            </div>
+                            <div class="input-field">
+                                <label>Teléfono de Contacto</label>
+                                <input type="tel" placeholder="10 dígitos" class="sketchy-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fa-solid fa-stethoscope"></i> 3. Información Médica</h3>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label>Alergias Conocidas</label>
+                                <textarea placeholder="Ninguna" class="sketchy-input"></textarea>
+                            </div>
+                            <div class="input-field">
+                                <label>Notas Especiales</label>
+                                <textarea placeholder="Condiciones, cuidados especiales..." class="sketchy-input"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-orange">Cancelar</button>
+                        <button type="submit" class="btn btn-green">Guardar Registro</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- View: Directorio -->
+            <section id="view-directorio" class="view">
+                <div class="directory-header">
+                    <h2 class="rainbow-text">Children Directory</h2>
+                    <div class="search-bar sketchy-input">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" placeholder="Buscar niño...">
+                    </div>
+                </div>
+
+                <div class="directory-list">
+                    <!-- Cards will be generated by JS, here are some dummy ones based on design -->
+                    <div class="kid-card sketchy-box">
+                        <div class="kid-card-color-bar" style="background-color: #81D4FA;"></div>
+                        <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Sofia" alt="Sofia" class="kid-avatar sketchy-box">
+                        <div class="kid-info">
+                            <h4>Sofia Ramirez</h4>
+                            <p><strong>5</strong> años <span class="dot"></span> Nivel: <strong>Kinder</strong></p>
+                        </div>
+                        <button class="btn btn-sm btn-blue"><i class="fa-solid fa-scroll"></i> Tarjeta</button>
+                    </div>
+
+                    <div class="kid-card sketchy-box">
+                        <div class="kid-card-color-bar" style="background-color: #FFB74D;"></div>
+                        <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Mateo" alt="Mateo" class="kid-avatar sketchy-box">
+                        <div class="kid-info">
+                            <h4>Mateo Garcia</h4>
+                            <p><strong>8</strong> años <span class="dot"></span> Nivel: <strong>Primaria</strong></p>
+                        </div>
+                        <button class="btn btn-sm btn-blue"><i class="fa-solid fa-scroll"></i> Tarjeta</button>
+                    </div>
+                    
+                    <div class="kid-card sketchy-box">
+                        <div class="kid-card-color-bar" style="background-color: #A5D6A7;"></div>
+                        <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Liam" alt="Liam" class="kid-avatar sketchy-box">
+                        <div class="kid-info">
+                            <h4>Liam Torres</h4>
+                            <p><strong>4</strong> años <span class="dot"></span> Nivel: <strong>Kinder</strong></p>
+                        </div>
+                        <button class="btn btn-sm btn-blue"><i class="fa-solid fa-scroll"></i> Tarjeta</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Asistencia (Placeholder for now) -->
+            <section id="view-asistencia" class="view">
+                <header class="view-header">
+                    <h2 style="color:var(--text-color);"><i class="fa-solid fa-calendar-check"></i> Asistencia Diaria</h2>
+                    <p>Módulo de pase de lista interactivo (Próximamente)</p>
+                </header>
+                <div class="construction-box sketchy-box">
+                    <i class="fa-solid fa-person-digging" style="font-size: 3rem; color: #ffb700;"></i>
+                    <h3>Construyendo el Pizarrón</h3>
+                    <p>Aquí pondremos la vista de tarjetas para el pase de lista dinámico.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal for ID Card Generation (Tarjetas de identidad) -->
+    <div id="id-card-modal" class="modal-overlay">
+        <div class="modal-content sketchy-box">
+            <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            <div id="id-card-preview" class="id-card sketchy-box">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-blue" onclick="window.print()">
+                    <i class="fa-solid fa-print"></i> Imprimir Tarjeta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
