@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const phone = form.querySelector('input[type="tel"]').value || "";
             const allergies = form.querySelectorAll('textarea')[0].value || "";
             const notes = form.querySelectorAll('textarea')[1].value || "";
+            const hasSiblings = document.getElementById('tiene-hermanos').checked;
 
             let photoUrl = null;
             const file = photoInput.files[0];
@@ -133,15 +134,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 photoUrl = await compressImageToBase64(file);
             }
 
+            // Autogenerar ID si no tiene
+            let autoId = null;
+            if(currentEditId && kidsDataMap[currentEditId]) {
+                autoId = kidsDataMap[currentEditId].idAuto;
+            }
+            if(!autoId) {
+                autoId = 'NDR-' + Math.floor(1000 + Math.random() * 9000);
+            }
+
             // Armamos el diccionario de actualización
             const dataToSave = {
+                idAuto: autoId,
                 nombreCompleto: fullName,
                 fechaNacimiento: birthDate,
                 genero: gender,
                 tutor: tutorName,
                 telefono: phone,
                 alergias: allergies,
-                notasEspeciales: notes
+                notasEspeciales: notes,
+                tieneHermanos: hasSiblings
             };
 
             // Solo actualizar/sobreescribir la url de la foto si subieron una foto nueva
@@ -191,15 +203,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { age, group } = getAgeAndGroup(childData.fechaNacimiento);
                 
                 let avatarUrl = childData.foto ? childData.foto : `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${childData.nombreCompleto.replace(/ /g, '')}`;
-                let colorBar = childData.genero === 'boy' ? '#81D4FA' : '#F48FB1';
+                
+                let colorBar = '#e0e0e0';
+                if(group === 'Gpo 1') colorBar = '#81D4FA'; // Azulito pastel
+                else if(group === 'Gpo 2') colorBar = '#A5D6A7'; // Verdecito pastel
+                else if(group === 'Gpo 3') colorBar = '#FFD54F'; // Amarillito
+                else colorBar = '#CE93D8'; // Moradito por defecto
+                
+                let idText = childData.idAuto || 'NDR-????';
+                let sisBroIcon = childData.tieneHermanos ? '<i class="fa-solid fa-children" style="color:#FF7043; margin-left:8px;" title="Tiene hermanos"></i>' : '';
 
                 const cardHtml = `
                     <div class="kid-card sketchy-box" data-id="${change.doc.id}">
                         <div class="kid-card-color-bar" style="background-color: ${colorBar};"></div>
                         <img src="${avatarUrl}" alt="${childData.nombreCompleto}" class="kid-avatar sketchy-box" style="object-fit:cover;">
                         <div class="kid-info">
-                            <h4>${childData.nombreCompleto}</h4>
-                            <p><strong>${age}</strong> años <span class="dot"></span> Clase: <strong>${group}</strong></p>
+                            <h4>${childData.nombreCompleto} ${sisBroIcon}</h4>
+                            <p style="font-size:0.9rem; color:#888;">ID: <strong>${idText}</strong></p>
+                            <p><strong>${age}</strong> años <span class="dot"></span> Clase: <strong style="color:${colorBar}; filter: brightness(0.6);">${group}</strong></p>
                         </div>
                         <div style="display:flex; flex-direction: column; gap: 5px;">
                             <button class="btn btn-sm btn-blue btn-tarjeta" style="width: 100%;"><i class="fa-solid fa-scroll"></i> Tarjeta</button>
@@ -248,12 +269,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(!data) return;
                 const { age, group } = getAgeAndGroup(data.fechaNacimiento);
                 const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${data.nombreCompleto.replace(/ /g, '')}`;
+                
+                const sisText = data.tieneHermanos ? `<p style="color:#FF7043; margin-top:5px;"><i class="fa-solid fa-children"></i> Con Hermanos Oficiales</p>` : '';
 
                 idCardPreview.innerHTML = `
                     <h2>Iglesia Niños del Rey</h2>
-                    <img src="${avatar}" alt="${data.nombreCompleto}">
+                    <small style="color:#888;">ID: ${data.idAuto || 'N/A'}</small>
+                    <img src="${avatar}" alt="${data.nombreCompleto}" style="object-fit:cover; margin-top:10px;">
                     <h3>${data.nombreCompleto}</h3>
                     <p><strong>${age}</strong> años <span class="dot"></span> <strong>${group}</strong></p>
+                    ${sisText}
                     ${data.alergias ? `<p style="color:red; font-size:1rem; margin-top:5px;"><i class="fa-solid fa-triangle-exclamation"></i> Alergias: ${data.alergias}</p>` : ''}
                     <div style="margin-top: 15px; border-top: 2px dashed #ccc; padding-top:10px;">
                         <small>Contacto de Emergencia en reverso</small>
@@ -281,10 +306,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.querySelector('input[placeholder="Ej. Juan Pérez"]').value = data.nombreCompleto || "";
                 form.querySelector('input[type="date"]').value = data.fechaNacimiento || "";
                 
-                // Mapear género a botones radiales
+                // Mapear género y check de hermanos
                 if(data.genero === "boy" || data.genero === "girl") {
                     form.querySelector(`input[name="gender"][value="${data.genero}"]`).checked = true;
                 }
+                document.getElementById('tiene-hermanos').checked = data.tieneHermanos ? true : false;
 
                 form.querySelector('input[placeholder="Ej. María López"]').value = data.tutor || "";
                 form.querySelector('input[type="tel"]').value = data.telefono || "";
