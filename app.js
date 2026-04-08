@@ -3,6 +3,30 @@ import { db, storage, collection, addDoc, doc, updateDoc, ref, uploadBytesResuma
 let currentEditId = null; // Variable global para rastrear si estamos editando
 let kidsDataMap = {};     // Diccionario en memoria para acceder fácil a los datos de cada niño
 
+// Renderiza dinámicamente la lista de hermanos en el select
+function renderSiblingsDropdown() {
+    const selectElem = document.getElementById('select-hermanos');
+    if(!selectElem) return;
+
+    // Preservar la selección actual si estamos escribiendo
+    const currentlySelected = Array.from(selectElem.selectedOptions).map(o => o.value);
+    selectElem.innerHTML = '';
+    
+    Object.keys(kidsDataMap).forEach(key => {
+        // Un niño no puede ser hermano de sí mismo
+        if (currentEditId === key) return;
+        
+        const kid = kidsDataMap[key];
+        const ageGrp = getAgeAndGroup(kid.fechaNacimiento).group;
+        const opt = document.createElement('option');
+        opt.value = key; // ID en firebase
+        opt.textContent = `${kid.nombreCompleto} (${ageGrp}) - ${kid.idAuto || ''}`;
+        
+        if (currentlySelected.includes(key)) opt.selected = true;
+        selectElem.appendChild(opt);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // === NAVEGACIÓN ===
     const navItems = document.querySelectorAll('.nav-item');
@@ -124,7 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const phone = form.querySelector('input[type="tel"]').value || "";
             const allergies = form.querySelectorAll('textarea')[0].value || "";
             const notes = form.querySelectorAll('textarea')[1].value || "";
-            const hasSiblings = document.getElementById('tiene-hermanos').checked;
+            
+            const selectHermanos = document.getElementById('select-hermanos');
+            const vinculados = Array.from(selectHermanos.selectedOptions).map(opt => opt.value);
 
             let photoUrl = null;
             const file = photoInput.files[0];
@@ -153,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 telefono: phone,
                 alergias: allergies,
                 notasEspeciales: notes,
-                tieneHermanos: hasSiblings
+                hermanosVinculados: vinculados
             };
 
             // Solo actualizar/sobreescribir la url de la foto si subieron una foto nueva
@@ -211,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else colorBar = '#CE93D8'; // Moradito por defecto
                 
                 let idText = childData.idAuto || 'NDR-????';
-                let sisBroIcon = childData.tieneHermanos ? '<i class="fa-solid fa-children" style="color:#FF7043; margin-left:8px;" title="Tiene hermanos"></i>' : '';
+                let sisBroIcon = (childData.hermanosVinculados && childData.hermanosVinculados.length > 0) ? '<i class="fa-solid fa-children" style="color:#FF7043; margin-left:8px;" title="Tiene hermanos"></i>' : '';
 
                 const cardHtml = `
                     <div class="kid-card sketchy-box" data-id="${change.doc.id}">
@@ -243,6 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Renderizar o refrescar el selector de familia
+        renderSiblingsDropdown();
         attachCardEvents();
     }, (error) => {
         console.warn("Base de datos sin conexión activa, mostrando dummies.", error);
@@ -270,7 +298,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { age, group } = getAgeAndGroup(data.fechaNacimiento);
                 const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${data.nombreCompleto.replace(/ /g, '')}`;
                 
-                const sisText = data.tieneHermanos ? `<p style="color:#FF7043; margin-top:5px;"><i class="fa-solid fa-children"></i> Con Hermanos Oficiales</p>` : '';
+                let sisText = '';
+                if (data.hermanosVinculados && data.hermanosVinculados.length > 0) {
+                    const nombresHerms = data.hermanosVinculados.map(hid => kidsDataMap[hid] ? kidsDataMap[hid].nombreCompleto : 'Cargando...').join(', ');
+                    sisText = `<p style="color:#FF7043; margin-top:5px; font-size:1rem;"><i class="fa-solid fa-children"></i> Hermano(s) de: <strong>${nombresHerms}</strong></p>`;
+                }
 
                 idCardPreview.innerHTML = `
                     <h2>Iglesia Niños del Rey</h2>
@@ -310,7 +342,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(data.genero === "boy" || data.genero === "girl") {
                     form.querySelector(`input[name="gender"][value="${data.genero}"]`).checked = true;
                 }
-                document.getElementById('tiene-hermanos').checked = data.tieneHermanos ? true : false;
+                
+                // Actualizar hermanos visualmente en el DOM (re render excluye a el mismo)
+                renderSiblingsDropdown();
+                const hermanitosArr = data.hermanosVinculados || [];
+                Array.from(document.getElementById('select-hermanos').options).forEach(opt => {
+                    opt.selected = hermanitosArr.includes(opt.value);
+                });
 
                 form.querySelector('input[placeholder="Ej. María López"]').value = data.tutor || "";
                 form.querySelector('input[type="tel"]').value = data.telefono || "";

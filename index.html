@@ -88,10 +88,13 @@
                             </div>
                         </div>
                         <div class="input-group" style="margin-top:10px;">
-                            <label style="cursor:pointer; display:flex; align-items:center; gap:8px; font-weight:bold; color:#555;">
-                                <input type="checkbox" id="tiene-hermanos" style="transform: scale(1.3);"> 
-                                <i class="fa-solid fa-children" style="color:#FF7043;"></i> Tiene hermanitos claseando
-                            </label>
+                            <div class="input-field" style="width:100%;">
+                                <label><i class="fa-solid fa-children" style="color:#FF7043;"></i> Vincular con Hermanos de la Base de Datos</label>
+                                <p style="font-size:0.8rem; color:#888;">Mantén presionado Ctrl (o Cmd) para seleccionar varios.</p>
+                                <select id="select-hermanos" multiple class="sketchy-input" style="height: auto; min-height: 100px;">
+                                    <!-- Options injected via JavaScript -->
+                                </select>
+                            </div>
                         </div>
                     </div>
 
