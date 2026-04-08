@@ -3,6 +3,25 @@ import { db, storage, collection, addDoc, doc, updateDoc, ref, uploadBytesResuma
 let currentEditId = null; // Variable global para rastrear si estamos editando
 let kidsDataMap = {};     // Diccionario en memoria para acceder fácil a los datos de cada niño
 
+// Función Auxiliar Global
+function getAgeAndGroup(birthDateStr) {
+    if(!birthDateStr) return { age: "?", group: "Sin Grupo" };
+    
+    const birthDate = new Date(birthDateStr);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    // Ajuste estricto
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    
+    let group = "Mayores";
+    if (age >= 0 && age <= 2) group = "Gpo 1";
+    else if (age >= 3 && age <= 8) group = "Gpo 2";
+    else if (age >= 9 && age <= 11) group = "Gpo 3";
+    
+    return { age, group };
+}
+
 // Renderiza dinámicamente la lista de hermanos en el select
 function renderSiblingsDropdown() {
     const selectElem = document.getElementById('select-hermanos');
@@ -64,27 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(e.target.files[0]);
         }
     });
-
-    // === FUNCIONES AUXILIARES (Cálculo de Edades y Grupos) ===
-    function getAgeAndGroup(birthDateStr) {
-        if(!birthDateStr) return { age: "?", group: "Sin Grupo" };
-        
-        const birthDate = new Date(birthDateStr);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        // Si el mes actual es menor al del cumple, o si es el mes pero el día no ha llegado, restamos un año
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        
-        let group = "Mayores";
-        if (age >= 0 && age <= 2) group = "Gpo 1";
-        else if (age >= 3 && age <= 8) group = "Gpo 2";
-        else if (age >= 9 && age <= 11) group = "Gpo 3";
-        
-        return { age, group };
-    }
 
     // === 1. LÓGICA DE REGISTRO Y EDICIÓN (FIREBASE) ===
     const form = document.getElementById('registro-form');
