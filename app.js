@@ -269,9 +269,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const { age, group } = getAgeAndGroup(data.fechaNacimiento);
         const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(data.nombreCompleto)}`;
         
-        // Generar QR en base al URL local (Vercel automatico) apuntando a data id
+        // Generar QR en base al URL local (Vercel automatico) apuntando a data id usando Google API que nunca falla
         const baseUrl = window.location.origin + window.location.pathname;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(baseUrl + '?kid=' + docId)}`;
+        const qrUrl = `https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=${encodeURIComponent(baseUrl + '?kid=' + docId)}&choe=UTF-8`;
 
         
         // Split name (First Name in Pink, Last Name in Blue)
@@ -292,20 +292,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <div class="id-card">
-                <div class="id-card-content" style="padding: 8px;">
-                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 48px; margin-bottom: 2px;">
+                <div class="id-card-content" style="padding: 6px; box-sizing: border-box;">
+                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 40px; margin-bottom: 2px;">
                     
-                    <div class="id-photo-container" style="width:85px; height:85px; margin-bottom:8px;">
-                        <img src="${avatar}" class="id-photo" alt="Foto">
+                    <div class="id-photo-container" style="width:75px; height:75px; margin-bottom:4px; padding:2px;">
+                        <img src="${avatar}" class="id-photo" alt="Foto" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
                     </div>
                     
-                    <h3 class="id-name" style="font-size:1.15rem; margin-top:2px; margin-bottom:2px;"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
-                    <p class="id-number" style="font-size:0.75rem; margin-top: 2px;">ID: ${data.idAuto || 'S/N'}</p>
-                    <p class="id-age-gpo" style="font-size:0.85rem; margin-bottom: 3px;">${age} años &bull; ${group}</p>
+                    <h3 class="id-name" style="font-size:1rem; margin-top:2px; margin-bottom:0px; line-height:1.1;"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
+                    <p class="id-number" style="font-size:0.65rem; margin-top: 2px; margin-bottom: 2px;">ID: ${data.idAuto || 'S/N'}</p>
+                    <p class="id-age-gpo" style="font-size:0.75rem; margin-bottom: 2px; margin-top: 0px;">${age} años &bull; ${group}</p>
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; margin-top:auto;">
                         ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div style="max-width:70%;"></div>'}
-                        <img src="${qrUrl}" alt="QR" style="width:45px; height:45px; border-radius:4px; border:1.5px solid #a855f7; display:block;">
+                        <img src="${qrUrl}" alt="QR" style="width:40px; height:40px; border-radius:4px; border:1px solid #ccc; display:block;">
                     </div>
                 </div>
             </div>

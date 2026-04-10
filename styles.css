@@ -183,6 +183,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     padding: 10px;
     position: relative;
     z-index: 1;
+    box-sizing: border-box;
 }
 
 .id-card-content .id-logo { height: 45px; margin-bottom: 2px; position:relative; z-index:2; border:none; object-fit:contain; border-radius:0; width:auto;}
@@ -215,10 +216,10 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 .id-siblings-box {
     background-color: #ffedd5;
     border: 1.5px dashed #fdba74;
-    border-radius: 6px;
-    padding: 3px 5px;
+    border-radius: 4px;
+    padding: 3px 4px;
     color: #ea580c;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -227,8 +228,9 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     width: 100%;
     text-align: left;
     line-height: 1.1;
+    box-sizing: border-box;
 }
-.id-siblings-box i { font-size: 0.9rem; }
+.id-siblings-box i { font-size: 0.8rem; }
 
 .modal-actions { text-align: center; }
 
