@@ -156,7 +156,8 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 .construction-box h3 { margin: 15px 0; font-family: var(--font-heading); color: var(--primary-orange);}
 
 @media (max-width: 768px) {
-    body { flex-direction: column; overflow-x: hidden; }
+    body { overflow-x: hidden; display: block; }
+    .app-container { flex-direction: column; width: 100%; overflow: visible; }
     .sidebar { width: 100%; height: auto; position: static; flex-direction: row; align-items:center; overflow-x: auto; border-right: none; border-bottom: 3px solid var(--border-color); padding: 0.8rem; box-sizing: border-box; z-index: 1000; background: var(--sidebar-bg); }
     .logo-container { margin-bottom: 0; margin-right: 15px; }
     .main-logo { height: 40px; }
@@ -165,7 +166,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     .nav-item i { font-size: 1.2rem; }
     .nav-item span { display: none; } /* Ocultar texto en móviles para mantener espacio visual */
     
-    .main-content { margin-left: 0; padding: 1rem; width: 100vw; box-sizing: border-box; }
+    .main-content { margin-left: 0; padding: 1rem; width: 100%; box-sizing: border-box; }
     .directory-header { flex-direction: column; gap:15px; align-items: stretch;}
     .search-bar { width: 100%; box-sizing: border-box; }
     .kid-card-inner { flex-direction: column; text-align: center; }
