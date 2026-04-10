@@ -156,19 +156,23 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 .construction-box h3 { margin: 15px 0; font-family: var(--font-heading); color: var(--primary-orange);}
 
 @media (max-width: 768px) {
-    body { flex-direction: column; }
-    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; align-items:center; overflow-x: auto; border-right: none; border-bottom: 3px solid var(--border-color); padding: 1rem; }
-    .logo-container { margin-bottom: 0; margin-right: 20px; }
-    .main-logo { height: 60px; }
-    .nav-links { flex-direction: row; justify-content: space-around; width:100%;}
-    .nav-item { flex-direction:column; gap:5px; padding: 10px; justify-content:center;}
+    body { flex-direction: column; overflow-x: hidden; }
+    .sidebar { width: 100%; height: auto; position: static; flex-direction: row; align-items:center; overflow-x: auto; border-right: none; border-bottom: 3px solid var(--border-color); padding: 0.8rem; box-sizing: border-box; z-index: 1000; background: var(--sidebar-bg); }
+    .logo-container { margin-bottom: 0; margin-right: 15px; }
+    .main-logo { height: 40px; }
+    .nav-links { flex-direction: row; justify-content: flex-start; gap: 10px; width: auto; overflow-x: auto; }
+    .nav-item { flex-direction:column; gap:5px; padding: 8px; justify-content:center; white-space: nowrap; }
     .nav-item i { font-size: 1.2rem; }
-    .nav-item span { display: none; } /* Ocultar texto en móviles para mantener espacio visual como ejemplo del usuario */
+    .nav-item span { display: none; } /* Ocultar texto en móviles para mantener espacio visual */
     
-    .main-content { margin-left: 0; padding: 1.5rem; }
-    .directory-header { flex-direction: column; gap:10px; align-items: flex-start;}
-    .search-bar { width: 100%; }
+    .main-content { margin-left: 0; padding: 1rem; width: 100vw; box-sizing: border-box; }
+    .directory-header { flex-direction: column; gap:15px; align-items: stretch;}
+    .search-bar { width: 100%; box-sizing: border-box; }
     .kid-card-inner { flex-direction: column; text-align: center; }
     .kid-info { text-align: center; }
-    .actions-box { flex-direction: row !important; width:100%; justify-content:center;}
+    .actions-box { flex-direction: column !important; width:100%; justify-content:center;}
+    
+    .input-field { min-width: 100%; }
+    .purple-header { display: block; text-align: center; margin: 0 0 20px 0; padding: 10px; transform: none;}
+    .rainbow-text { font-size: 2.2rem; text-align: center; }
 }
