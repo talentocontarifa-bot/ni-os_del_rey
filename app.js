@@ -242,27 +242,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let avatarUrl = childData.foto ? childData.foto : `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${childData.nombreCompleto.replace(/ /g, '')}`;
                 
-                let colorBar = '#e0e0e0';
-                if(group === 'Gpo 1') colorBar = '#81D4FA'; // Azulito pastel
-                else if(group === 'Gpo 2') colorBar = '#A5D6A7'; // Verdecito pastel
-                else if(group === 'Gpo 3') colorBar = '#FFD54F'; // Amarillito
-                else colorBar = '#CE93D8'; // Moradito por defecto
+                let bgColor = '#f9f6ea';
+                if(group === 'Gpo 1') bgColor = '#f4b4b9'; // Pink
+                else if(group === 'Gpo 2') bgColor = '#b1d8a4'; // Green
+                else if(group === 'Gpo 3') bgColor = '#a2ccec'; // Blue
+                else bgColor = '#fde68a'; // Amarillo
                 
                 let idText = childData.idAuto || 'NDR_??';
-                let sisBroIcon = (childData.hermanosVinculados && childData.hermanosVinculados.length > 0) ? '<i class="fa-solid fa-children" style="color:#FF7043; margin-left:8px;" title="Tiene hermanos"></i>' : '';
+                let sisBroIcon = (childData.hermanosVinculados && childData.hermanosVinculados.length > 0) ? '<i class="fa-solid fa-children" style="color:#222; margin-left:8px;" title="Tiene hermanos"></i>' : '';
 
                 const cardHtml = `
-                    <div class="kid-card sketchy-box" data-id="${change.doc.id}">
-                        <div class="kid-card-color-bar" style="background-color: ${colorBar};"></div>
-                        <img src="${avatarUrl}" alt="${childData.nombreCompleto}" class="kid-avatar sketchy-box" style="object-fit:cover;">
-                        <div class="kid-info">
-                            <h4>${childData.nombreCompleto} ${sisBroIcon}</h4>
-                            <p style="font-size:0.9rem; color:#888;">ID: <strong>${idText}</strong></p>
-                            <p><strong>${age}</strong> años <span class="dot"></span> Clase: <strong style="color:${colorBar}; filter: brightness(0.6);">${group}</strong></p>
-                        </div>
-                        <div style="display:flex; flex-direction: column; gap: 5px;">
-                            <button class="btn btn-sm btn-blue btn-tarjeta" style="width: 100%;"><i class="fa-solid fa-scroll"></i> Tarjeta</button>
-                            <button class="btn btn-sm btn-orange btn-editar" style="width: 100%; background: #FFCC80; border-color: #EF6C00; color: #E65100; font-size:0.9rem;"><i class="fa-solid fa-pencil"></i> Editar</button>
+                    <div class="kid-card" data-id="${change.doc.id}" style="background-color: ${bgColor};">
+                        <div class="card-corner corner-tl"></div>
+                        <div class="card-corner corner-tr"></div>
+                        <div class="card-corner corner-bl"></div>
+                        <div class="card-corner corner-br"></div>
+                        
+                        <div class="kid-card-inner">
+                            <img src="${avatarUrl}" alt="${childData.nombreCompleto}" class="kid-avatar">
+                            
+                            <div class="kid-info">
+                                <h4>${childData.nombreCompleto} ${sisBroIcon}</h4>
+                                <p style="font-size:0.9rem; color:#444;">ID: <strong>${idText}</strong></p>
+                                <p><strong>${age}</strong> años <span class="dot"></span> Clase: <strong>${group}</strong></p>
+                            </div>
+                            
+                            <div class="actions-box">
+                                <button class="btn btn-blue btn-tarjeta" style="background:#fcf9f2; color:#333;"><i class="fa-solid fa-scroll"></i> Tarjeta</button>
+                                <button class="btn btn-orange btn-editar" style="background:#fde68a; color:#333;"><i class="fa-solid fa-pencil"></i> Editar</button>
+                            </div>
                         </div>
                     </div>
                 `;
