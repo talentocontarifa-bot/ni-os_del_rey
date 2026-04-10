@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const cardHtml = `
                     <div class="kid-card" data-id="${change.doc.id}" style="background-color: ${bgColor};">
-                        <input type="checkbox" class="kid-selector" data-id="${change.doc.id}" style="margin: 10px;">
+                        <input type="checkbox" class="checkbox-brutal kid-selector" data-id="${change.doc.id}">
                         <div class="card-corner corner-tl"></div>
                         <div class="card-corner corner-tr"></div>
                         <div class="card-corner corner-bl"></div>
@@ -383,6 +383,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.kid-card .btn').forEach(btn => {
             const clone = btn.cloneNode(true);
             btn.parentNode.replaceChild(clone, btn);
+        });
+        
+        // Listener para las checkboxes
+        document.querySelectorAll('.kid-selector').forEach(cb => {
+            cb.addEventListener('change', updateBatchPrintButton);
         });
 
         // RE-ATAR EVENTOS DE TARJETA (MODAL)
