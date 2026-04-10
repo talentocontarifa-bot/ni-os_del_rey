@@ -345,9 +345,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <p><strong>${age}</strong> años <span class="dot"></span> Clase: <strong>${group}</strong></p>
                             </div>
                             
-                            <div class="actions-box">
-                                <button class="btn btn-blue btn-tarjeta" style="background:#fcf9f2; color:#333;"><i class="fa-solid fa-scroll"></i> Tarjeta</button>
-                                <button class="btn btn-orange btn-editar" style="background:#fde68a; color:#333;"><i class="fa-solid fa-pencil"></i> Editar</button>
+                            <div class="actions-box" style="display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+                                <button class="btn btn-ficha" style="background:#bae6fd; color:#0369a1; padding:5px 8px; font-size:0.8rem; border:2px solid #0369a1; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-eye"></i> Ficha</button>
+                                <button class="btn btn-tarjeta" style="background:#fcf9f2; color:#333; padding:5px 8px; font-size:0.8rem; border:2px solid #333; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-id-badge"></i> Gafete</button>
+                                <button class="btn btn-editar" style="background:#fde68a; color:#333; padding:5px 8px; font-size:0.8rem; border:2px solid #333; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-pencil"></i> Editar</button>
                             </div>
                         </div>
                     </div>
@@ -404,6 +405,37 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // ATAR EVENTOS A "Ficha Completa" (NUEVO MODAL)
+        document.querySelectorAll('.btn-ficha').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const card = e.target.closest('.kid-card');
+                const id = card.getAttribute('data-id');
+                const data = kidsDataMap[id];
+                if(!data) return;
+                
+                const { age, group } = getAgeAndGroup(data.fechaNacimiento);
+                const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(data.nombreCompleto)}`;
+                
+                document.getElementById('info-preview').innerHTML = `
+                    <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px; border-bottom:3px solid #eee; padding-bottom:15px;">
+                        <img src="${avatar}" style="width:80px;height:80px;border-radius:50%;border:3px solid #333; object-fit:cover;">
+                        <div>
+                            <h2 style="margin:0; font-family:'Fredoka One'; color:#3b82f6; font-size:1.6rem; line-height:1.1;">${data.nombreCompleto}</h2>
+                            <p style="margin:5px 0 0 0; color:#666;">ID: ${data.idAuto || 'N/A'} <span style="margin-left:5px; background:#fde68a; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.8rem; border:2px solid #333; color:#333;">${group}</span></p>
+                        </div>
+                    </div>
+                    <div style="font-size:1.05rem; line-height:1.6;">
+                        <p><strong><i class="fa-solid fa-cake-candles" style="color:#ec4899; width:20px;"></i> Edad:</strong> ${age} años (Nace: ${data.fechaNacimiento || 'N/A'})</p>
+                        <p><strong><i class="fa-solid fa-person-breastfeeding" style="color:#a855f7; width:20px;"></i> Tutor:</strong> ${data.tutor || 'No registrado'}</p>
+                        <p><strong><i class="fa-solid fa-phone" style="color:#10b981; width:20px;"></i> Teléfono:</strong> <a href="tel:${data.telefono}" style="color:#10b981; text-decoration:none; font-weight:700;">${data.telefono || 'No registrado'}</a></p>
+                        <p><strong><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; width:20px;"></i> Alergias:</strong> <span style="color:#ef4444;">${data.alergias || 'Ninguna declarada'}</span></p>
+                        <p><strong><i class="fa-solid fa-clipboard" style="color:#f59e0b; width:20px;"></i> Notas extra:</strong> ${data.notasEspeciales || 'Ninguna'}</p>
+                    </div>
+                `;
+                document.getElementById('info-modal').classList.add('active');
+            });
+        });
+
         // ATAR EVENTOS AL BOTÓN DE EDITAR
         document.querySelectorAll('.btn-editar').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -456,7 +488,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Cerrar el Modal de la Identidad
+    // Cerrar el Modal del Gafete
     document.querySelector('.close-modal').addEventListener('click', () => modal.classList.remove('active'));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+
+    // Cerrar el Modal de la Ficha
+    const infoModal = document.getElementById('info-modal');
+    document.querySelector('.close-modal-info').addEventListener('click', () => infoModal.classList.remove('active'));
+    infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.classList.remove('active'); });
+
 });
