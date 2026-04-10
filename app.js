@@ -237,6 +237,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Helper Global para UI Id-Card identica a Maqueta
+    function generateIdCardHTML(data) {
+        const { age, group } = getAgeAndGroup(data.fechaNacimiento);
+        const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(data.nombreCompleto)}`;
+        
+        // Split name (First Name in Pink, Last Name in Blue)
+        const parts = (data.nombreCompleto || 'Desconocido').split(' ');
+        const first = parts.shift() || '';
+        const last = parts.join(' ') || '';
+
+        let sisText = '';
+        if (data.hermanosVinculados && data.hermanosVinculados.length > 0) {
+            const nombresHerms = data.hermanosVinculados.map(hid => kidsDataMap[hid] ? kidsDataMap[hid].nombreCompleto : 'Cargando...').join(', ');
+            sisText = `
+                <div class="id-siblings-box">
+                    <i class="fa-solid fa-children"></i> 
+                    <span>Hermano(s) de:<br/>${nombresHerms}</span>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="id-card">
+                <div class="id-card-content">
+                    <img src="logo.webp" class="id-logo" alt="Niños del Rey">
+                    <p class="id-church-name">Iglesia Castillo del Rey Cancún</p>
+                    
+                    <div class="id-photo-container">
+                        <img src="${avatar}" class="id-photo" alt="Foto">
+                    </div>
+                    
+                    <h3 class="id-name"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
+                    <p class="id-number">ID: ${data.idAuto || 'S/N'}</p>
+                    <p class="id-age-gpo">${age} años &bull; ${group}</p>
+                    
+                    ${sisText}
+                </div>
+            </div>
+        `;
+    }
+
     // Setup batch print logic
     const btnPrintBatch = document.getElementById('btn-print-batch');
     if(btnPrintBatch) {
@@ -251,21 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedCheckboxes.forEach(cb => {
                 const kid = kidsDataMap[cb.dataset.id];
                 if(kid) {
-                    const { age, group } = getAgeAndGroup(kid.fechaNacimiento);
-                    const avatarUrl = kid.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(kid.nombreCompleto)}`;
-
-                    const grupoHTML = `<span style="display:inline-block; margin-top:5px; padding:3px 10px; background:#fff; border-radius:12px; border:2px solid #333;">${group}</span>`;
-                    
-                    container.innerHTML += `
-                        <div class="id-card sketchy-box">
-                            <span class="logo-watermark">🏰</span>
-                            <img src="${avatarUrl}" alt="${kid.nombreCompleto}" style="width:100px; height:100px; object-fit:cover;">
-                            <h3>${kid.nombreCompleto}</h3>
-                            <p>${age} años</p>
-                            ${grupoHTML}
-                            <p style="margin-top:10px; font-size:0.8rem;">ID: ${kid.idAuto}</p>
-                        </div>
-                    `;
+                    container.innerHTML += generateIdCardHTML(kid);
                 }
             });
             
@@ -367,27 +394,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = kidsDataMap[id];
                 
                 if(!data) return;
-                const { age, group } = getAgeAndGroup(data.fechaNacimiento);
-                const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${data.nombreCompleto.replace(/ /g, '')}`;
                 
-                let sisText = '';
-                if (data.hermanosVinculados && data.hermanosVinculados.length > 0) {
-                    const nombresHerms = data.hermanosVinculados.map(hid => kidsDataMap[hid] ? kidsDataMap[hid].nombreCompleto : 'Cargando...').join(', ');
-                    sisText = `<p style="color:#FF7043; margin-top:5px; font-size:1rem;"><i class="fa-solid fa-children"></i> Hermano(s) de: <strong>${nombresHerms}</strong></p>`;
-                }
-
-                idCardPreview.innerHTML = `
-                    <h2>Iglesia Niños del Rey</h2>
-                    <small style="color:#888;">ID: ${data.idAuto || 'N/A'}</small>
-                    <img src="${avatar}" alt="${data.nombreCompleto}" style="object-fit:cover; margin-top:10px;">
-                    <h3>${data.nombreCompleto}</h3>
-                    <p><strong>${age}</strong> años <span class="dot"></span> <strong>${group}</strong></p>
-                    ${sisText}
-                    ${data.alergias ? `<p style="color:red; font-size:1rem; margin-top:5px;"><i class="fa-solid fa-triangle-exclamation"></i> Alergias: ${data.alergias}</p>` : ''}
-                    <div style="margin-top: 15px; border-top: 2px dashed #ccc; padding-top:10px;">
-                        <small>Contacto de Emergencia en reverso</small>
-                    </div>
-                `;
+                idCardPreview.innerHTML = generateIdCardHTML(data);
                 modal.classList.add('active');
             });
         });
