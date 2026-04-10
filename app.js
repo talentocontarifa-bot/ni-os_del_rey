@@ -281,31 +281,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let sisText = '';
         if (data.hermanosVinculados && data.hermanosVinculados.length > 0) {
-            const nombresHerms = data.hermanosVinculados.map(hid => kidsDataMap[hid] ? kidsDataMap[hid].nombreCompleto : 'Cargando...').join(', ');
+            const nombresHerms = data.hermanosVinculados.map(hid => kidsDataMap[hid] ? kidsDataMap[hid].nombreCompleto : '...').join(', ');
             sisText = `
                 <div class="id-siblings-box">
                     <i class="fa-solid fa-children"></i> 
-                    <span>Hermano(s) de:<br/>${nombresHerms}</span>
+                    <span>Hermanos:<br/>${nombresHerms}</span>
                 </div>
             `;
         }
 
         return `
             <div class="id-card">
-                <div class="id-card-content">
-                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 55px; margin-bottom: 5px;">
+                <div class="id-card-content" style="padding: 8px;">
+                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 48px; margin-bottom: 2px;">
                     
-                    <div class="id-photo-container" style="width:100px; height:100px;">
+                    <div class="id-photo-container" style="width:85px; height:85px; margin-bottom:8px;">
                         <img src="${avatar}" class="id-photo" alt="Foto">
                     </div>
                     
-                    <h3 class="id-name" style="font-size:1.25rem;"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
-                    <p class="id-number" style="font-size:0.75rem;">ID: ${data.idAuto || 'S/N'}</p>
-                    <p class="id-age-gpo" style="font-size:0.95rem;">${age} años &bull; ${group}</p>
+                    <h3 class="id-name" style="font-size:1.15rem; margin-top:2px; margin-bottom:2px;"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
+                    <p class="id-number" style="font-size:0.75rem; margin-top: 2px;">ID: ${data.idAuto || 'S/N'}</p>
+                    <p class="id-age-gpo" style="font-size:0.85rem; margin-bottom: 3px;">${age} años &bull; ${group}</p>
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; margin-top:auto;">
-                        ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div></div>'}
-                        <img src="${qrUrl}" alt="QR" style="width:50px; height:50px; border-radius:6px; border:2px solid #a855f7;">
+                        ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div style="max-width:70%;"></div>'}
+                        <img src="${qrUrl}" alt="QR" style="width:45px; height:45px; border-radius:4px; border:1.5px solid #a855f7; display:block;">
                     </div>
                 </div>
             </div>
@@ -338,12 +338,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === 2. DIRECTORIO EN TIEMPO REAL (FIREBASE) ===
     const directoryList = document.querySelector('.directory-list');
-    let isFirstLoad = true;
+    let isInitialLoadDone = false;
     
     onSnapshot(collection(db, "ninos"), (snapshot) => {
-        if (isFirstLoad && !snapshot.empty) {
+        if (!isInitialLoadDone && !snapshot.empty) {
             directoryList.innerHTML = ''; 
-            isFirstLoad = false;
         }
 
         snapshot.docChanges().forEach((change) => {
@@ -407,10 +406,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Revisar si hay Link de codigo QR entrante (Una sola vez en la carga)
         const urlParams = new URLSearchParams(window.location.search);
         const kidIdFromUrl = urlParams.get('kid');
-        if(isFirstLoad && kidIdFromUrl && kidsDataMap[kidIdFromUrl]) {
+        if(!isInitialLoadDone && kidIdFromUrl && kidsDataMap[kidIdFromUrl]) {
             showFichaForKid(kidIdFromUrl);
-            isFirstLoad = false;
         }
+        
+        isInitialLoadDone = true;
 
         // Renderizar o refrescar el selector de familia
         renderSiblingsDropdown();

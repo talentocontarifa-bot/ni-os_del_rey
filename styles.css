@@ -214,20 +214,21 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 
 .id-siblings-box {
     background-color: #ffedd5;
-    border: 2px dashed #fdba74;
-    border-radius: 8px;
-    padding: 6px 10px;
+    border: 1.5px dashed #fdba74;
+    border-radius: 6px;
+    padding: 3px 5px;
     color: #ea580c;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     font-weight: 700;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 95%;
-    text-align: center;
+    justify-content: flex-start;
+    gap: 4px;
+    width: 100%;
+    text-align: left;
+    line-height: 1.1;
 }
-.id-siblings-box i { font-size: 1.1rem; }
+.id-siblings-box i { font-size: 0.9rem; }
 
 .modal-actions { text-align: center; }
 
