@@ -237,10 +237,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Helper Global para UI Id-Card identica a Maqueta
-    function generateIdCardHTML(data) {
+    // Helper Global para Ficha Técnica
+    function showFichaForKid(id) {
+        const data = kidsDataMap[id];
+        if(!data) return;
+        
         const { age, group } = getAgeAndGroup(data.fechaNacimiento);
         const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(data.nombreCompleto)}`;
+        
+        document.getElementById('info-preview').innerHTML = `
+            <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px; border-bottom:3px solid #eee; padding-bottom:15px;">
+                <img src="${avatar}" style="width:80px;height:80px;border-radius:50%;border:3px solid #333; object-fit:cover;">
+                <div>
+                    <h2 style="margin:0; font-family:'Fredoka One'; color:#3b82f6; font-size:1.6rem; line-height:1.1;">${data.nombreCompleto}</h2>
+                    <p style="margin:5px 0 0 0; color:#666;">ID: ${data.idAuto || 'N/A'} <span style="margin-left:5px; background:#fde68a; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.8rem; border:2px solid #333; color:#333;">${group}</span></p>
+                </div>
+            </div>
+            <div style="font-size:1.05rem; line-height:1.6;">
+                <p><strong><i class="fa-solid fa-cake-candles" style="color:#ec4899; width:20px;"></i> Edad:</strong> ${age} años (Nace: ${data.fechaNacimiento || 'N/A'})</p>
+                <p><strong><i class="fa-solid fa-person-breastfeeding" style="color:#a855f7; width:20px;"></i> Tutor:</strong> ${data.tutor || 'No registrado'}</p>
+                <p><strong><i class="fa-solid fa-phone" style="color:#10b981; width:20px;"></i> Teléfono:</strong> <a href="tel:${data.telefono}" style="color:#10b981; text-decoration:none; font-weight:700;">${data.telefono || 'No registrado'}</a></p>
+                <p><strong><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; width:20px;"></i> Alergias:</strong> <span style="color:#ef4444;">${data.alergias || 'Ninguna declarada'}</span></p>
+                <p><strong><i class="fa-solid fa-clipboard" style="color:#f59e0b; width:20px;"></i> Notas extra:</strong> ${data.notasEspeciales || 'Ninguna'}</p>
+            </div>
+        `;
+        document.getElementById('info-modal').classList.add('active');
+    }
+
+    // Helper Global para UI Id-Card identica a Maqueta
+    function generateIdCardHTML(data, docId) {
+        const { age, group } = getAgeAndGroup(data.fechaNacimiento);
+        const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(data.nombreCompleto)}`;
+        
+        // Generar QR en base al URL local (Vercel automatico) apuntando a data id
+        const baseUrl = window.location.origin + window.location.pathname;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(baseUrl + '?kid=' + docId)}`;
+
         
         // Split name (First Name in Pink, Last Name in Blue)
         const parts = (data.nombreCompleto || 'Desconocido').split(' ');
@@ -261,17 +293,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
             <div class="id-card">
                 <div class="id-card-content">
-                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 60px; margin-bottom: 5px;">
+                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 55px; margin-bottom: 5px;">
                     
-                    <div class="id-photo-container">
+                    <div class="id-photo-container" style="width:100px; height:100px;">
                         <img src="${avatar}" class="id-photo" alt="Foto">
                     </div>
                     
-                    <h3 class="id-name"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
-                    <p class="id-number">ID: ${data.idAuto || 'S/N'}</p>
-                    <p class="id-age-gpo">${age} años &bull; ${group}</p>
+                    <h3 class="id-name" style="font-size:1.25rem;"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
+                    <p class="id-number" style="font-size:0.75rem;">ID: ${data.idAuto || 'S/N'}</p>
+                    <p class="id-age-gpo" style="font-size:0.95rem;">${age} años &bull; ${group}</p>
                     
-                    ${sisText}
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; margin-top:auto;">
+                        ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div></div>'}
+                        <img src="${qrUrl}" alt="QR" style="width:50px; height:50px; border-radius:6px; border:2px solid #a855f7;">
+                    </div>
                 </div>
             </div>
         `;
@@ -289,9 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = ''; // Clear
             
             selectedCheckboxes.forEach(cb => {
-                const kid = kidsDataMap[cb.dataset.id];
+                const docId = cb.dataset.id;
+                const kid = kidsDataMap[docId];
                 if(kid) {
-                    container.innerHTML += generateIdCardHTML(kid);
+                    container.innerHTML += generateIdCardHTML(kid, docId);
                 }
             });
             
@@ -368,6 +404,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Revisar si hay Link de codigo QR entrante (Una sola vez en la carga)
+        const urlParams = new URLSearchParams(window.location.search);
+        const kidIdFromUrl = urlParams.get('kid');
+        if(isFirstLoad && kidIdFromUrl && kidsDataMap[kidIdFromUrl]) {
+            showFichaForKid(kidIdFromUrl);
+            isFirstLoad = false;
+        }
+
         // Renderizar o refrescar el selector de familia
         renderSiblingsDropdown();
         attachCardEvents();
@@ -391,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cb.addEventListener('change', updateBatchPrintButton);
         });
 
-        // RE-ATAR EVENTOS DE TARJETA (MODAL)
+        // RE-ATAR EVENTOS DE TARJETA (MODAL GAFETE)
         document.querySelectorAll('.btn-tarjeta').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const card = e.target.closest('.kid-card');
@@ -400,39 +444,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if(!data) return;
                 
-                idCardPreview.innerHTML = generateIdCardHTML(data);
+                idCardPreview.innerHTML = generateIdCardHTML(data, id);
                 modal.classList.add('active');
             });
         });
 
-        // ATAR EVENTOS A "Ficha Completa" (NUEVO MODAL)
+        // ATAR EVENTOS A "Ficha Completa" (NUEVO MODAL INFO)
         document.querySelectorAll('.btn-ficha').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const card = e.target.closest('.kid-card');
                 const id = card.getAttribute('data-id');
-                const data = kidsDataMap[id];
-                if(!data) return;
-                
-                const { age, group } = getAgeAndGroup(data.fechaNacimiento);
-                const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(data.nombreCompleto)}`;
-                
-                document.getElementById('info-preview').innerHTML = `
-                    <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px; border-bottom:3px solid #eee; padding-bottom:15px;">
-                        <img src="${avatar}" style="width:80px;height:80px;border-radius:50%;border:3px solid #333; object-fit:cover;">
-                        <div>
-                            <h2 style="margin:0; font-family:'Fredoka One'; color:#3b82f6; font-size:1.6rem; line-height:1.1;">${data.nombreCompleto}</h2>
-                            <p style="margin:5px 0 0 0; color:#666;">ID: ${data.idAuto || 'N/A'} <span style="margin-left:5px; background:#fde68a; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.8rem; border:2px solid #333; color:#333;">${group}</span></p>
-                        </div>
-                    </div>
-                    <div style="font-size:1.05rem; line-height:1.6;">
-                        <p><strong><i class="fa-solid fa-cake-candles" style="color:#ec4899; width:20px;"></i> Edad:</strong> ${age} años (Nace: ${data.fechaNacimiento || 'N/A'})</p>
-                        <p><strong><i class="fa-solid fa-person-breastfeeding" style="color:#a855f7; width:20px;"></i> Tutor:</strong> ${data.tutor || 'No registrado'}</p>
-                        <p><strong><i class="fa-solid fa-phone" style="color:#10b981; width:20px;"></i> Teléfono:</strong> <a href="tel:${data.telefono}" style="color:#10b981; text-decoration:none; font-weight:700;">${data.telefono || 'No registrado'}</a></p>
-                        <p><strong><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; width:20px;"></i> Alergias:</strong> <span style="color:#ef4444;">${data.alergias || 'Ninguna declarada'}</span></p>
-                        <p><strong><i class="fa-solid fa-clipboard" style="color:#f59e0b; width:20px;"></i> Notas extra:</strong> ${data.notasEspeciales || 'Ninguna'}</p>
-                    </div>
-                `;
-                document.getElementById('info-modal').classList.add('active');
+                showFichaForKid(id);
             });
         });
 
