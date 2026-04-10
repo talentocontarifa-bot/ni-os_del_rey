@@ -13,8 +13,20 @@
     --font-body: 'Nunito', sans-serif;
 }
 
-/* General */
-body { font-family: var(--font-body); background-color: var(--bg-color); color: var(--text-color); margin:0; display:flex; min-height:100vh;}
+/* General and Box Sizing Reset */
+*, *::before, *::after { box-sizing: border-box; }
+
+body { 
+    font-family: var(--font-body); 
+    background-color: var(--bg-color); 
+    /* Pattern de puntitos neo brutalista */
+    background-image: radial-gradient(#d6cdb4 1.5px, transparent 1.5px);
+    background-size: 20px 20px;
+    color: var(--text-color); 
+    margin:0; 
+    display:flex; 
+    min-height:100vh;
+}
 h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 
 /* Remove previous complex border constraints */
@@ -146,10 +158,12 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 .modal-overlay.active { opacity: 1; pointer-events: all; }
 .modal-content { background: #fff; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px rgba(0,0,0,0.1); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; position: relative; }
 .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; font-weight:bold;}
-.id-card { width: 100%; height: auto; background: var(--bg-color); border: 3px dashed var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; margin-bottom: 20px; text-align: center; border-radius: 12px;}
-.id-card img { width: 110px; height: 110px; border-radius: 50%; margin-bottom: 15px; border: 3px solid var(--border-color); object-fit:cover;}
-.id-card h3 { font-family: var(--font-heading); font-size: 2.2rem; color: #f472b6; }
-.id-card p { font-size: 1.2rem; font-weight: bold; margin-top: 5px; color: #555;}
+.id-card { width: 7cm; height: 9cm; background: var(--bg-color); border: 3px dashed var(--border-color); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; margin: 0 auto 20px auto; text-align: center; border-radius: 12px; position:relative; overflow:hidden;}
+.id-card img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; border: 3px solid var(--border-color); object-fit:cover;}
+.id-card h3 { font-family: var(--font-heading); font-size: 1.4rem; color: #f472b6; margin: 0 0 5px 0;}
+.id-card p { font-size: 0.95rem; font-weight: bold; margin-top: 0; margin-bottom: 5px; color: #555;}
+.id-card .logo-watermark { position:absolute; bottom: -20px; right: -20px; font-size: 5rem; opacity: 0.1; z-index:0; pointer-events:none;}
+.id-card > * { z-index: 1; }
 .modal-actions { text-align: center; }
 
 .construction-box { padding: 40px; text-align: center; background-color: #fcf9f2; margin-top: 20px; border: 3px solid #333; border-radius: 16px;}
@@ -176,4 +190,20 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     .input-field { min-width: 100%; }
     .purple-header { display: block; text-align: center; margin: 0 0 20px 0; padding: 10px; transform: none;}
     .rainbow-text { font-size: 2.2rem; text-align: center; }
+}
+
+/* Print Styles para asegurar la medida real de 7x9cm */
+@media print {
+    body * { visibility: hidden; }
+    #id-card-modal, #id-card-modal * { visibility: visible; }
+    #id-card-modal { position: absolute; left: 0; top: 0; background: transparent; width:100%; height:100%; }
+    .id-card { 
+        width: 7cm !important; 
+        height: 9cm !important; 
+        margin: 0 !important;
+        /* Forzar forzar impresion a color */
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact;
+    }
+    .modal-actions, .close-modal { display: none !important; }
 }
