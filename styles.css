@@ -134,12 +134,13 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 .directory-list { display: flex; flex-direction: column; gap: 20px; }
 
 /* The new exact Card UI */
-.kid-card { border: 3px solid var(--border-color); border-radius: 16px; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); position: relative; padding: 6px; transition: transform 0.2s; }
+.kid-card { border: 3px solid var(--border-color); border-radius: 16px; box-shadow: 4px 4px 0px rgba(0,0,0,0.1); position: relative; padding: 6px; transition: transform 0.2s; background-color: #fff;}
+.checkbox-brutal { position: absolute; top: 12px; right: 12px; width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary-orange); z-index: 20; border: 3px solid #333 !important;}
 .kid-card:hover { transform: translateY(-2px); box-shadow: 4px 6px 0px rgba(0,0,0,0.15); }
 .kid-card-inner { border: 2px dashed var(--border-color); border-radius: 10px; padding: 16px; display: flex; align-items: center; gap: 24px; }
 .card-corner { width: 12px; height: 12px; border: 2px solid var(--border-color); border-radius: 50%; position: absolute; background-color: #fff; z-index: 10; }
 .corner-tl { top: 12px; left: 12px; }
-.corner-tr { top: 12px; right: 12px; }
+.corner-tr { bottom: auto; top: auto; display:none; /* Disabled to give space for checkbox if needed, or adjust */ } 
 .corner-bl { bottom: 12px; left: 12px; }
 .corner-br { bottom: 12px; right: 12px; }
 
@@ -192,15 +193,27 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     .rainbow-text { font-size: 2.2rem; text-align: center; }
 }
 
+#print-batch-container { display: none; }
+
 /* Print Styles para asegurar la medida real de 7x9cm */
 @media print {
     body * { visibility: hidden; }
+    /* Configuración para Imprimir la Individual */
     #id-card-modal, #id-card-modal * { visibility: visible; }
+    /* Configuración para Impresión Masiva (Grid) */
+    #print-batch-container, #print-batch-container * { visibility: visible; }
+    
     #id-card-modal { position: absolute; left: 0; top: 0; background: transparent; width:100%; height:100%; }
+    #print-batch-container { 
+        display: flex !important; flex-wrap: wrap; gap: 15px; position: absolute; left: 0; top: 0; width: 100vw; justify-content: flex-start;
+    }
+    
     .id-card { 
         width: 7cm !important; 
         height: 9cm !important; 
-        margin: 0 !important;
+        margin: 0 15px 15px 0 !important;
+        page-break-inside: avoid;
+        float: left; /* Evita que queden espacios en blanco grandes */
         /* Forzar forzar impresion a color */
         -webkit-print-color-adjust: exact; 
         print-color-adjust: exact;

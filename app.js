@@ -46,6 +46,20 @@ function renderSiblingsDropdown() {
     });
 }
 
+function updateBatchPrintButton() {
+    const selectedCount = document.querySelectorAll('.kid-selector:checked').length;
+    const btn = document.getElementById('btn-print-batch');
+    const span = document.getElementById('print-batch-count');
+    if(btn) {
+        if(selectedCount > 0) {
+            btn.style.display = 'inline-flex';
+            if(span) span.textContent = selectedCount;
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // === NAVEGACIÓN ===
     const navItems = document.querySelectorAll('.nav-item');
@@ -223,6 +237,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Setup batch print logic
+    const btnPrintBatch = document.getElementById('btn-print-batch');
+    if(btnPrintBatch) {
+        btnPrintBatch.addEventListener('click', () => {
+            const selectedCheckboxes = document.querySelectorAll('.kid-selector:checked');
+            if(selectedCheckboxes.length === 0) return;
+            
+            const container = document.getElementById('print-batch-container');
+            if(!container) return;
+            container.innerHTML = ''; // Clear
+            
+            selectedCheckboxes.forEach(cb => {
+                const kid = kidsDataMap[cb.dataset.id];
+                if(kid) {
+                    const { age, group } = getAgeAndGroup(kid.fechaNacimiento);
+                    const avatarUrl = kid.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(kid.nombreCompleto)}`;
+
+                    const grupoHTML = `<span style="display:inline-block; margin-top:5px; padding:3px 10px; background:#fff; border-radius:12px; border:2px solid #333;">${group}</span>`;
+                    
+                    container.innerHTML += `
+                        <div class="id-card sketchy-box">
+                            <span class="logo-watermark">🏰</span>
+                            <img src="${avatarUrl}" alt="${kid.nombreCompleto}" style="width:100px; height:100px; object-fit:cover;">
+                            <h3>${kid.nombreCompleto}</h3>
+                            <p>${age} años</p>
+                            ${grupoHTML}
+                            <p style="margin-top:10px; font-size:0.8rem;">ID: ${kid.idAuto}</p>
+                        </div>
+                    `;
+                }
+            });
+            
+            document.getElementById('id-card-modal').classList.remove('active');
+            window.print();
+        });
+    }
+
     // === 2. DIRECTORIO EN TIEMPO REAL (FIREBASE) ===
     const directoryList = document.querySelector('.directory-list');
     let isFirstLoad = true;
@@ -253,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const cardHtml = `
                     <div class="kid-card" data-id="${change.doc.id}" style="background-color: ${bgColor};">
+                        <input type="checkbox" class="kid-selector" data-id="${change.doc.id}" style="margin: 10px;">
                         <div class="card-corner corner-tl"></div>
                         <div class="card-corner corner-tr"></div>
                         <div class="card-corner corner-bl"></div>
