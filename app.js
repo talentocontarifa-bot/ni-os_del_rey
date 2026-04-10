@@ -261,8 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
             <div class="id-card">
                 <div class="id-card-content">
-                    <img src="logo.webp" class="id-logo" alt="Niños del Rey">
-                    <p class="id-church-name">Iglesia Castillo del Rey Cancún</p>
+                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 60px; margin-bottom: 5px;">
                     
                     <div class="id-photo-container">
                         <img src="${avatar}" class="id-photo" alt="Foto">
