@@ -261,31 +261,37 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 
 #print-batch-container { display: none; }
 
-/* Print Styles para asegurar la medida real de 7x9cm */
+/* ================== MEDIA QUERIES (PRINT NATIVO PDF) ================== */
 @media print {
-    body * { visibility: hidden; }
-    /* Configuración para Imprimir la Individual */
-    #id-card-modal, #id-card-modal * { visibility: visible; }
-    /* Configuración para Impresión Masiva (Grid) */
-    #print-batch-container, #print-batch-container * { visibility: visible; }
+    body * { visibility: hidden !important; }
     
-    /* Ocultar el modal container padding etc para impresion */
-    #id-card-modal { position: absolute; left: 0; top: 0; background: transparent; width:100%; height:100%; padding:0; border:none; box-shadow:none; }
-    #id-card-modal .modal-content { border:none; box-shadow:none; padding:0; border-radius:0; background:transparent;}
-    #id-card-preview { background: transparent; padding: 0; border:none;}
-    #print-batch-container { 
-        display: flex !important; flex-wrap: wrap; gap: 15px; position: absolute; left: 0; top: 0; width: 100vw; justify-content: flex-start;
+    /* El modal de id-card y todo su contenido deben ser visibles */
+    #id-card-preview, #id-card-preview * {
+        visibility: visible !important;
     }
-    
-    .id-card { 
-        width: 7cm !important; 
-        height: 9cm !important; 
-        margin: 0 15px 15px 0 !important;
+
+    #id-card-preview {
+        position: absolute;
+        left: 0;
+        top: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Ajustar las propiedades de la credencial en impresión para evitar páginas vacías */
+    .id-card {
+        margin: 0 !important;
+        box-shadow: none !important;
         page-break-inside: avoid;
-        float: left; /* Evita que queden espacios en blanco grandes */
-        /* Forzar forzar impresion a color */
-        -webkit-print-color-adjust: exact; 
-        print-color-adjust: exact;
     }
+
+    /* Que el fondo se respete */
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    
     .modal-actions, .close-modal { display: none !important; }
+
+    @page {
+        size: 70mm 93mm;
+        margin: 0;
+    }
 }
