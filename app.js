@@ -46,19 +46,8 @@ function renderSiblingsDropdown() {
     });
 }
 
-function updateBatchPrintButton() {
-    const selectedCount = document.querySelectorAll('.kid-selector:checked').length;
-    const btn = document.getElementById('btn-print-batch');
-    const span = document.getElementById('print-batch-count');
-    if(btn) {
-        if(selectedCount > 0) {
-            btn.style.display = 'inline-flex';
-            if(span) span.textContent = selectedCount;
-        } else {
-            btn.style.display = 'none';
-        }
-    }
-}
+// Función obsoleta (se elimina la impresión masiva para sustituirla por descarga individual)
+function updateBatchPrintButton() {}
 
 document.addEventListener('DOMContentLoaded', () => {
     // === NAVEGACIÓN ===
@@ -312,27 +301,42 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // Setup batch print logic
-    const btnPrintBatch = document.getElementById('btn-print-batch');
-    if(btnPrintBatch) {
-        btnPrintBatch.addEventListener('click', () => {
-            const selectedCheckboxes = document.querySelectorAll('.kid-selector:checked');
-            if(selectedCheckboxes.length === 0) return;
+    // Setup Download PDF logic
+    const btnDownloadPdf = document.getElementById('btn-download-pdf');
+    if(btnDownloadPdf) {
+        btnDownloadPdf.addEventListener('click', async () => {
+            const cardEl = document.querySelector('#id-card-preview .id-card');
+            if(!cardEl) return;
             
-            const container = document.getElementById('print-batch-container');
-            if(!container) return;
-            container.innerHTML = ''; // Clear
-            
-            selectedCheckboxes.forEach(cb => {
-                const docId = cb.dataset.id;
-                const kid = kidsDataMap[docId];
-                if(kid) {
-                    container.innerHTML += generateIdCardHTML(kid, docId);
-                }
-            });
-            
-            document.getElementById('id-card-modal').classList.remove('active');
-            window.print();
+            const originalText = btnDownloadPdf.innerHTML;
+            btnDownloadPdf.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando PDF...';
+            btnDownloadPdf.disabled = true;
+
+            try {
+                // scale: 4 for ultra high def print quality
+                const canvas = await html2canvas(cardEl, { scale: 4, useCORS: true, backgroundColor: null });
+                const imgData = canvas.toDataURL('image/png');
+                
+                // load jsPDF
+                window.jspdf = window.jspdf || {};
+                const { jsPDF } = window.jspdf;
+                
+                // Create PDF matches: width 70mm, height 93mm
+                const pdf = new jsPDF('p', 'mm', [70, 93]);
+                pdf.addImage(imgData, 'PNG', 0, 0, 70, 93);
+                
+                // Use the name
+                const nameEl = cardEl.querySelector('.id-name');
+                const cleanName = nameEl ? nameEl.innerText.replace(/\n/g, '').replace(/ /g, '_') : 'Gafete_NDR';
+                
+                pdf.save(`${cleanName}.pdf`);
+            } catch (err) {
+                console.error(err);
+                alert("Error creando el PDF. Intenta de nuevo.");
+            } finally {
+                btnDownloadPdf.innerHTML = originalText;
+                btnDownloadPdf.disabled = false;
+            }
         });
     }
 
@@ -365,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const cardHtml = `
                     <div class="kid-card" data-id="${change.doc.id}" style="background-color: ${bgColor};">
-                        <input type="checkbox" class="checkbox-brutal kid-selector" data-id="${change.doc.id}">
+                        
                         <div class="card-corner corner-tl"></div>
                         <div class="card-corner corner-tr"></div>
                         <div class="card-corner corner-bl"></div>
