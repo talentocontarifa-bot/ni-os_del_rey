@@ -263,35 +263,74 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 
 /* ================== MEDIA QUERIES (PRINT NATIVO PDF) ================== */
 @media print {
+    body, html {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 100% !important;
+        overflow: hidden !important;
+    }
+
     body * { visibility: hidden !important; }
     
-    /* El modal de id-card y todo su contenido deben ser visibles */
-    #id-card-preview, #id-card-preview * {
+    #id-card-modal, #id-card-preview, #id-card-preview * {
         visibility: visible !important;
     }
 
-    #id-card-preview {
-        position: absolute;
-        left: 0;
-        top: 0;
-        margin: 0;
-        padding: 0;
+    #id-card-modal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 70mm !important;
+        height: 93mm !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 
-    /* Ajustar las propiedades de la credencial en impresión para evitar páginas vacías */
-    .id-card {
+    #id-card-preview {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
         margin: 0 !important;
+        padding: 0 !important;
+        width: 70mm !important;
+        height: 93mm !important;
+    }
+
+    .id-card {
+        width: 70mm !important;
+        height: 93mm !important;
+        max-width: 70mm !important;
+        max-height: 93mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
         box-shadow: none !important;
         page-break-inside: avoid;
+        overflow: hidden !important;
     }
 
-    /* Que el fondo se respete */
+    .id-card-content {
+        width: 100% !important;
+        height: 100% !important;
+        box-sizing: border-box !important;
+    }
+
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     
+    .modal-content {
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        max-width: none !important;
+    }
+
     .modal-actions, .close-modal { display: none !important; }
 
     @page {
         size: 70mm 93mm;
-        margin: 0;
+        margin: 0mm;
     }
 }
