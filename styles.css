@@ -263,70 +263,54 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 
 /* ================== MEDIA QUERIES (PRINT NATIVO PDF) ================== */
 @media print {
-    /* Desactivar fondo global y limites */
     body, html {
         margin: 0 !important;
         padding: 0 !important;
-        background: none !important;
-        height: auto !important;
+        background: white !important;
     }
 
-    /* Destruir el dashboard para que no genere multiples paginas en blanco */
-    .sidebar, .main-content {
-        display: none !important;
-    }
+    body * { visibility: hidden !important; }
     
-    /* El contenedor modal pasa a ser el documento raiz virtual */
-    #id-card-modal {
-        position: relative !important;
-        display: block !important;
-        background: transparent !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        border: none !important;
-        width: auto !important;
-        height: auto !important;
+    #id-card-preview, #id-card-preview * {
+        visibility: visible !important;
     }
 
-    /* Ocultar el marco visual del modal y sus botones */
-    .modal-content {
-        background: transparent !important;
-        box-shadow: none !important;
-        border: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    .modal-actions, .close-modal { 
-        display: none !important; 
-    }
-
+    /* Anclamos el contenedor principal al limite exacto de la pagina impresa */
     #id-card-preview {
-        display: block !important;
-        position: relative !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
         margin: 0 !important;
         padding: 0 !important;
+        z-index: 999999 !important;
+        background: white !important;
     }
 
-    /* La tarjeta se imprime arriba a la izquierda con tamaño exacto */
+    /* Mantenemos estrictamente los px del diseño de escritorio para que NO se descuadre internamente. 
+       250px son ~66.1mm, lo cual entra perfectamente en la hoja de 70mm. */
     .id-card {
-        width: 70mm !important;
-        height: 93mm !important;
-        max-width: 70mm !important;
-        max-height: 93mm !important;
+        width: 250px !important;
+        height: 350px !important;
+        max-width: none !important;
+        max-height: none !important;
         margin: 0 !important;
         padding: 0 !important;
         box-shadow: none !important;
         page-break-inside: avoid;
-        page-break-after: avoid;
-        page-break-before: avoid;
-        overflow: hidden !important;
+        transform: scale(0.98) !important; /* Ligera reduccion para el margen de seguridad de impresoras */
+        transform-origin: center center !important;
     }
 
     .id-card-content {
         width: 100% !important;
         height: 100% !important;
         box-sizing: border-box !important;
-        background-color: white !important;
+        margin: 0 !important;
     }
 
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
