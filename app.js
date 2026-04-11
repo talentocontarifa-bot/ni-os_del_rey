@@ -258,9 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const { age, group } = getAgeAndGroup(data.fechaNacimiento);
         const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(data.nombreCompleto)}`;
         
-        // Generar QR en base al URL local (Vercel automatico) apuntando a data id usando Google API que nunca falla
+        // Generar QR en base al URL local (Vercel automatico) apuntando a data id
         const baseUrl = window.location.origin + window.location.pathname;
-        const qrUrl = `https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=${encodeURIComponent(baseUrl + '?kid=' + docId)}&choe=UTF-8`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(baseUrl + '?kid=' + docId)}`;
 
         
         // Split name (First Name in Pink, Last Name in Blue)
@@ -281,62 +281,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <div class="id-card">
-                <div class="id-card-content" style="padding: 6px; box-sizing: border-box;">
-                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 40px; margin-bottom: 2px;">
+                <div class="id-card-content" style="padding: 8px;">
+                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 48px; margin-bottom: 2px;">
                     
-                    <div class="id-photo-container" style="width:75px; height:75px; margin-bottom:4px; padding:2px;">
-                        <img src="${avatar}" class="id-photo" alt="Foto" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                    <div class="id-photo-container" style="width:85px; height:85px; margin-bottom:8px;">
+                        <img src="${avatar}" class="id-photo" alt="Foto">
                     </div>
                     
-                    <h3 class="id-name" style="font-size:1rem; margin-top:2px; margin-bottom:0px; line-height:1.1;"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
-                    <p class="id-number" style="font-size:0.65rem; margin-top: 2px; margin-bottom: 2px;">ID: ${data.idAuto || 'S/N'}</p>
-                    <p class="id-age-gpo" style="font-size:0.75rem; margin-bottom: 2px; margin-top: 0px;">${age} años &bull; ${group}</p>
+                    <h3 class="id-name" style="font-size:1.15rem; margin-top:2px; margin-bottom:2px;"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
+                    <p class="id-number" style="font-size:0.75rem; margin-top: 2px;">ID: ${data.idAuto || 'S/N'}</p>
+                    <p class="id-age-gpo" style="font-size:0.85rem; margin-bottom: 3px;">${age} años &bull; ${group}</p>
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; margin-top:auto;">
                         ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div style="max-width:70%;"></div>'}
-                        <img src="${qrUrl}" alt="QR" style="width:40px; height:40px; border-radius:4px; border:1px solid #ccc; display:block;">
+                        <img src="${qrUrl}" alt="QR" style="width:45px; height:45px; border-radius:4px; border:1.5px solid #a855f7; display:block;">
                     </div>
                 </div>
             </div>
         `;
     }
 
-    // Setup Download PDF logic
+    // Setup Download PDF logic using window.print for native vector fonts rendering
     const btnDownloadPdf = document.getElementById('btn-download-pdf');
     if(btnDownloadPdf) {
-        btnDownloadPdf.addEventListener('click', async () => {
-            const cardEl = document.querySelector('#id-card-preview .id-card');
-            if(!cardEl) return;
-            
-            const originalText = btnDownloadPdf.innerHTML;
-            btnDownloadPdf.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generando PDF...';
-            btnDownloadPdf.disabled = true;
-
-            try {
-                // scale: 4 for ultra high def print quality
-                const canvas = await html2canvas(cardEl, { scale: 4, useCORS: true, backgroundColor: null });
-                const imgData = canvas.toDataURL('image/png');
-                
-                // load jsPDF
-                window.jspdf = window.jspdf || {};
-                const { jsPDF } = window.jspdf;
-                
-                // Create PDF matches: width 70mm, height 93mm
-                const pdf = new jsPDF('p', 'mm', [70, 93]);
-                pdf.addImage(imgData, 'PNG', 0, 0, 70, 93);
-                
-                // Use the name
-                const nameEl = cardEl.querySelector('.id-name');
-                const cleanName = nameEl ? nameEl.innerText.replace(/\n/g, '').replace(/ /g, '_') : 'Gafete_NDR';
-                
-                pdf.save(`${cleanName}.pdf`);
-            } catch (err) {
-                console.error(err);
-                alert("Error creando el PDF. Intenta de nuevo.");
-            } finally {
-                btnDownloadPdf.innerHTML = originalText;
-                btnDownloadPdf.disabled = false;
-            }
+        btnDownloadPdf.addEventListener('click', () => {
+            window.print();
         });
     }
 

@@ -183,7 +183,6 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     padding: 10px;
     position: relative;
     z-index: 1;
-    box-sizing: border-box;
 }
 
 .id-card-content .id-logo { height: 45px; margin-bottom: 2px; position:relative; z-index:2; border:none; object-fit:contain; border-radius:0; width:auto;}
