@@ -311,41 +311,40 @@ document.addEventListener('DOMContentLoaded', () => {
             const nameElement = cardElement.querySelector('.firstname');
             const docName = nameElement ? nameElement.innerText.replace(/[^a-z0-9_]/gi, '') : 'Credencial';
             
-            // Blindaje Titanio: Crearemos un centro de impresion fijo en el viewport
-            const printWrapper = document.createElement('div');
-            printWrapper.style.position = 'fixed'; // FIXED, no absolute para seguirte si estas scrolleado
-            printWrapper.style.top = '0px';
-            printWrapper.style.left = '0px';
-            printWrapper.style.width = '280px';
-            printWrapper.style.height = '372px';
-            printWrapper.style.background = '#ffffff';
-            printWrapper.style.zIndex = '999999'; // En primerisimo plano, funciona como pantalla de carga
-            
-            const clone = cardElement.cloneNode(true);
-            clone.style.margin = '0'; // Quitar autos para no centrar
-            printWrapper.appendChild(clone);
-            document.body.appendChild(printWrapper);
-            
-            // Pasar la imagen secreta del QR
-            const origCvs = cardElement.querySelector('canvas');
-            const cloneCvs = clone.querySelector('canvas');
-            if(origCvs && cloneCvs) {
-                cloneCvs.getContext('2d').drawImage(origCvs, 0, 0);
-            }
+            // Blindaje Titanio Absoluto: Regreso a lo nativo
+            // Quitamos la sombra momentaneamente. Esto es crucial porque la sombra
+            // engorda invisiblemente la tarjeta de 280px a 320px y cuando se pegaba
+            // al PDF de 280px, la orilla derecha quedaba desbordada/recortada.
+            const origShadow = cardElement.style.boxShadow;
+            cardElement.style.boxShadow = 'none';
+            cardElement.style.transform = 'none';
 
-            const opt = {
-                margin:       0,
-                filename:     `Credencial_NDR_${docName}.pdf`,
-                image:        { type: 'jpeg', quality: 1 },
-                // Forzar todas las variables a 0 garantiza no perder de vista a nuestro clon
-                html2canvas:  { scale: 3, useCORS: true, scrollX: 0, scrollY: -window.scrollY },
-                jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait' }
-            };
+            html2canvas(cardElement, {
+                scale: 4, // 4x Resolucion Ultra HD
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                // Devolvemos la sombra
+                cardElement.style.boxShadow = origShadow;
 
-            // Generar PDF 
-            html2pdf().set(opt).from(clone).save().then(() => {
-                // Eliminar clone despues de descargar
-                document.body.removeChild(printWrapper);
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                
+                // Dimensiones exactas matematicas: Ancho 70 milimetros
+                const mmWidth = 70;
+                // Calculamos la altura basandonos en los pixeles reales capturados (aprox 93mm)
+                // esto imposibilita cortes o desfaces porque el lienzo abraza la foto de forma dinamica.
+                const mmHeight = (canvas.height / canvas.width) * mmWidth;
+
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: [mmWidth, mmHeight],
+                    compress: true
+                });
+
+                // Pegamos sin offsets: x=0, y=0
+                pdf.addImage(imgData, 'JPEG', 0, 0, mmWidth, mmHeight);
+                pdf.save(`Credencial_NDR_${docName}.pdf`);
             });
         });
     }
