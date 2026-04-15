@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; margin-top:auto;">
                         ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div style="max-width:70%;"></div>'}
-                        <canvas id="qr-canvas-${id}" style="width:45px; height:45px; border-radius:4px; border:1.5px solid #a855f7; display:block;"></canvas>
+                        <canvas id="qr-canvas-${docId}" style="width:45px; height:45px; border-radius:4px; border:1.5px solid #a855f7; display:block;"></canvas>
                     </div>
                 </div>
             </div>
@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Generar código QR offline/local para evadir bloqueadores
                 setTimeout(() => {
                     new QRious({
-                        element: document.getElementById(`qr-canvas-${data.idAuto || id}`),
+                        element: document.getElementById(`qr-canvas-${id}`),
                         value: `${window.location.origin}/?kid=${id}`,
                         size: 200,
                         level: 'M'
