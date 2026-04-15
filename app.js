@@ -315,39 +315,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 margin:       0,
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
-                // Configuracion para atrapar exactamente el tamano del clon
-                html2canvas:  { scale: 4, useCORS: true, windowWidth: 800, windowHeight: 1000 },
+                html2canvas:  { scale: 4, useCORS: true },
                 jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait', hotfixes: ["px_scaling"] }
             };
             
-            // Truco anti-amputacion funcional: Colocamos el clon detras del pop-up (z-index)
-            // html2canvas no renderiza imagenes si estan en coordenadas negativas como -9999px.
-            const printContainer = document.createElement('div');
-            printContainer.style.position = 'fixed';
-            printContainer.style.top = '0px';
-            printContainer.style.left = '0px';
-            printContainer.style.padding = '0';
-            printContainer.style.margin = '0';
-            printContainer.style.zIndex = '1'; // El modal tiene z-index: 100, asi que esto se oculta debajo
+            // LA SOLUCION SUPREMA: Mover la tarjeta temporalmente al 1er plano del navegador
+            // Esto anula todas las restricciones celulares (overflow, paddings, bounds).
+            const parent = cardElement.parentNode;
+            const nextSibling = cardElement.nextSibling;
             
-            document.body.appendChild(printContainer);
+            // 1) Guardar estado original
+            const origPosition = cardElement.style.position;
+            const origTop = cardElement.style.top;
+            const origLeft = cardElement.style.left;
+            const origZIndex = cardElement.style.zIndex;
             
-            const clone = cardElement.cloneNode(true);
-            clone.style.margin = '0';
-            clone.style.transform = 'none'; 
-            printContainer.appendChild(clone);
-            
-            // Pasar la imagen del Canvas (codigo QR) porque el cloneNode se salta los canvas
-            const originalCanvas = cardElement.querySelector('canvas');
-            const clonedCanvas = clone.querySelector('canvas');
-            if (originalCanvas && clonedCanvas) {
-                const ctx = clonedCanvas.getContext('2d');
-                ctx.drawImage(originalCanvas, 0, 0);
-            }
+            // 2) Preparar para la foto pura (0,0)
+            window.scrollTo(0, 0);
+            cardElement.style.position = 'absolute';
+            cardElement.style.top = '0';
+            cardElement.style.left = '0';
+            cardElement.style.zIndex = '999999';
+            document.body.appendChild(cardElement);
 
-            // Generar PDF usando el clon perfecto y luego destruir la evidencia
-            html2pdf().set(opt).from(clone).save().then(() => {
-                document.body.removeChild(printContainer);
+            // 3) Generar PDF y retornar elemento a la normalidad
+            html2pdf().set(opt).from(cardElement).save().then(() => {
+                // Devolver todo como estaba
+                cardElement.style.position = origPosition;
+                cardElement.style.top = origTop;
+                cardElement.style.left = origLeft;
+                cardElement.style.zIndex = origZIndex;
+                
+                if (nextSibling) {
+                    parent.insertBefore(cardElement, nextSibling);
+                } else {
+                    parent.appendChild(cardElement);
+                }
             });
         });
     }
