@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; margin-top:auto;">
                         ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div style="max-width:70%;"></div>'}
-                        <img src="${qrUrl}" alt="QR" style="width:45px; height:45px; border-radius:4px; border:1.5px solid #a855f7; display:block;">
+                        <canvas id="qr-canvas-${id}" style="width:45px; height:45px; border-radius:4px; border:1.5px solid #a855f7; display:block;"></canvas>
                     </div>
                 </div>
             </div>
