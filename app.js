@@ -315,12 +315,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 margin:       0,
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 4, useCORS: true },
-                jsPDF:        { unit: 'mm', format: [70, 93], orientation: 'portrait' }
+                html2canvas:  { scale: 4, useCORS: true, windowWidth: 500 },
+                jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait', hotfixes: ["px_scaling"] }
             };
             
-            // Generar PDF usando html2pdf sin invocar navegador
-            html2pdf().set(opt).from(cardElement).save();
+            // Truco anti-amputacion: Crear un clon fuera de camara para que la pantalla del celular no lo aplaste
+            const printContainer = document.createElement('div');
+            printContainer.style.position = 'absolute';
+            printContainer.style.left = '-9999px';
+            printContainer.style.top = '-9999px';
+            printContainer.style.width = '500px'; 
+            document.body.appendChild(printContainer);
+            
+            const clone = cardElement.cloneNode(true);
+            clone.style.transform = 'none'; // Reset por si acaso
+            printContainer.appendChild(clone);
+            
+            // Pasar la imagen del Canvas (codigo QR) porque el cloneNode se salta los canvas
+            const originalCanvas = cardElement.querySelector('canvas');
+            const clonedCanvas = clone.querySelector('canvas');
+            if (originalCanvas && clonedCanvas) {
+                const ctx = clonedCanvas.getContext('2d');
+                ctx.drawImage(originalCanvas, 0, 0);
+            }
+
+            // Generar PDF usando el clon perfecto y luego destruir la evidencia
+            html2pdf().set(opt).from(clone).save().then(() => {
+                document.body.removeChild(printContainer);
+            });
         });
     }
 
