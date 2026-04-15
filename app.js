@@ -315,41 +315,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 margin:       0,
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 4, useCORS: true },
-                jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait', hotfixes: ["px_scaling"] }
+                html2canvas:  { scale: 3, useCORS: true },
+                jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait' }
             };
             
-            // LA SOLUCION SUPREMA: Mover la tarjeta temporalmente al 1er plano del navegador
-            // Esto anula todas las restricciones celulares (overflow, paddings, bounds).
-            const parent = cardElement.parentNode;
-            const nextSibling = cardElement.nextSibling;
+            // Metodo seguro: Prevenir aplastamiento en multiples pantallas 
+            // expandiendo forzosamente el pop-up a un ancho gigante temporalmente
+            const modalBox = cardElement.closest('.modal-content');
+            let origPadding = '';
+            let origWidth = '';
+            let origMaxWidth = '';
             
-            // 1) Guardar estado original
-            const origPosition = cardElement.style.position;
-            const origTop = cardElement.style.top;
-            const origLeft = cardElement.style.left;
-            const origZIndex = cardElement.style.zIndex;
-            
-            // 2) Preparar para la foto pura (0,0)
-            window.scrollTo(0, 0);
-            cardElement.style.position = 'absolute';
-            cardElement.style.top = '0';
-            cardElement.style.left = '0';
-            cardElement.style.zIndex = '999999';
-            document.body.appendChild(cardElement);
-
-            // 3) Generar PDF y retornar elemento a la normalidad
-            html2pdf().set(opt).from(cardElement).save().then(() => {
-                // Devolver todo como estaba
-                cardElement.style.position = origPosition;
-                cardElement.style.top = origTop;
-                cardElement.style.left = origLeft;
-                cardElement.style.zIndex = origZIndex;
+            if (modalBox) {
+                origPadding = modalBox.style.padding;
+                origWidth = modalBox.style.width;
+                origMaxWidth = modalBox.style.maxWidth;
                 
-                if (nextSibling) {
-                    parent.insertBefore(cardElement, nextSibling);
-                } else {
-                    parent.appendChild(cardElement);
+                modalBox.style.padding = '5px';
+                modalBox.style.width = '800px';
+                modalBox.style.maxWidth = '800px';
+            }
+
+            // Generar PDF 
+            html2pdf().set(opt).from(cardElement).save().then(() => {
+                // Devolver el pop-up a la normalidad
+                if (modalBox) {
+                    modalBox.style.padding = origPadding;
+                    modalBox.style.width = origWidth;
+                    modalBox.style.maxWidth = origMaxWidth;
                 }
             });
         });
