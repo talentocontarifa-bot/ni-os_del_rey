@@ -315,20 +315,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 margin:       0,
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 4, useCORS: true, windowWidth: 500 },
+                // Configuracion para atrapar exactamente el tamano del clon
+                html2canvas:  { scale: 4, useCORS: true, windowWidth: 800, windowHeight: 1000 },
                 jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait', hotfixes: ["px_scaling"] }
             };
             
-            // Truco anti-amputacion: Crear un clon fuera de camara para que la pantalla del celular no lo aplaste
+            // Truco anti-amputacion funcional: Colocamos el clon detras del pop-up (z-index)
+            // html2canvas no renderiza imagenes si estan en coordenadas negativas como -9999px.
             const printContainer = document.createElement('div');
-            printContainer.style.position = 'absolute';
-            printContainer.style.left = '-9999px';
-            printContainer.style.top = '-9999px';
-            printContainer.style.width = '500px'; 
+            printContainer.style.position = 'fixed';
+            printContainer.style.top = '0px';
+            printContainer.style.left = '0px';
+            printContainer.style.padding = '0';
+            printContainer.style.margin = '0';
+            printContainer.style.zIndex = '1'; // El modal tiene z-index: 100, asi que esto se oculta debajo
+            
             document.body.appendChild(printContainer);
             
             const clone = cardElement.cloneNode(true);
-            clone.style.transform = 'none'; // Reset por si acaso
+            clone.style.margin = '0';
+            clone.style.transform = 'none'; 
             printContainer.appendChild(clone);
             
             // Pasar la imagen del Canvas (codigo QR) porque el cloneNode se salta los canvas
