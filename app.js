@@ -301,11 +301,26 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // Setup Download PDF logic using window.print for native vector fonts rendering
+    // Setup Download PDF logic using html2pdf
     const btnDownloadPdf = document.getElementById('btn-download-pdf');
     if(btnDownloadPdf) {
         btnDownloadPdf.addEventListener('click', () => {
-            window.print();
+            const cardElement = document.querySelector('#id-card-preview .id-card');
+            if(!cardElement) return;
+
+            const nameElement = cardElement.querySelector('.firstname');
+            const docName = nameElement ? nameElement.innerText.replace(/[^a-z0-9_]/gi, '') : 'Credencial';
+            
+            const opt = {
+                margin:       0,
+                filename:     `Credencial_NDR_${docName}.pdf`,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 4, useCORS: true },
+                jsPDF:        { unit: 'mm', format: [70, 93], orientation: 'portrait' }
+            };
+            
+            // Generar PDF usando html2pdf sin invocar navegador
+            html2pdf().set(opt).from(cardElement).save();
         });
     }
 
@@ -418,6 +433,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(!data) return;
                 
                 idCardPreview.innerHTML = generateIdCardHTML(data, id);
+                
+                // Generar código QR offline/local para evadir bloqueadores
+                setTimeout(() => {
+                    new QRious({
+                        element: document.getElementById(`qr-canvas-${data.idAuto || id}`),
+                        value: `${window.location.origin}/?kid=${id}`,
+                        size: 200,
+                        level: 'M'
+                    });
+                }, 50);
+
                 modal.classList.add('active');
             });
         });
