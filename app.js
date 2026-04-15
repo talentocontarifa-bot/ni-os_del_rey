@@ -319,31 +319,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait' }
             };
             
-            // Metodo seguro: Prevenir aplastamiento en multiples pantallas 
-            // expandiendo forzosamente el pop-up a un ancho gigante temporalmente
+            // Metodo Quirurgico: Evitar desbordes y offsets 
+            // Eliminamos los rellenos del pop-up para que la tarjeta de 280px 
+            // encaje perfecto en la pantalla del telefono (320px) sin aplastarse ni crear scroll.
             const modalBox = cardElement.closest('.modal-content');
             let origPadding = '';
-            let origWidth = '';
-            let origMaxWidth = '';
             
             if (modalBox) {
                 origPadding = modalBox.style.padding;
-                origWidth = modalBox.style.width;
-                origMaxWidth = modalBox.style.maxWidth;
-                
-                modalBox.style.padding = '5px';
-                modalBox.style.width = '800px';
-                modalBox.style.maxWidth = '800px';
+                modalBox.style.padding = '5px'; // Darle espacio a los bordes
             }
+
+            const origMargin = cardElement.style.margin;
+            cardElement.style.margin = '0 auto'; 
 
             // Generar PDF 
             html2pdf().set(opt).from(cardElement).save().then(() => {
                 // Devolver el pop-up a la normalidad
                 if (modalBox) {
                     modalBox.style.padding = origPadding;
-                    modalBox.style.width = origWidth;
-                    modalBox.style.maxWidth = origMaxWidth;
                 }
+                cardElement.style.margin = origMargin;
             });
         });
     }
