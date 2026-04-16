@@ -575,6 +575,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSiblingsDropdown();
         renderMaestrosDropdowns();
         attachCardEvents();
+        
+        // Refrescar posibles cumpleañeros en pantalla
+        if (typeof renderCumpleaneros === 'function') {
+            renderCumpleaneros();
+        }
     }, (error) => {
         console.warn("Base de datos sin conexión activa, mostrando dummies.", error);
     });
@@ -884,6 +889,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
             calendarGrid.appendChild(dayHtml);
         }
+
+        renderCumpleaneros();
+    }
+
+    function renderCumpleaneros() {
+        const lista = document.getElementById('lista-cumpleaneros');
+        if (!lista) return;
+        lista.innerHTML = '';
+        const currentMonth = calendarDate.getMonth() + 1; // 1-12
+        
+        const cumpleaneros = Object.values(kidsDataMap).filter(k => {
+            if(!k.fechaNacimiento) return false;
+            const parts = k.fechaNacimiento.split('-');
+            if(parts.length < 3) return false;
+            return parseInt(parts[1], 10) === currentMonth;
+        });
+
+        if (cumpleaneros.length === 0) {
+            lista.innerHTML = '<li style="color:#888; font-size:0.9rem;">Ninguno este mes.</li>';
+            return;
+        }
+
+        // Ordenar por dia
+        cumpleaneros.sort((a,b) => parseInt(a.fechaNacimiento.split('-')[2]) - parseInt(b.fechaNacimiento.split('-')[2]));
+
+        cumpleaneros.forEach(k => {
+            const day = k.fechaNacimiento.split('-')[2];
+            const isMaestro = k.tipoPersona === 'maestro';
+            const icon = isMaestro ? '👨‍🏫' : '👧👦';
+            lista.insertAdjacentHTML('beforeend', `<li style="padding: 5px 0; border-bottom: 1px dashed #fbcfe8; font-size:0.9rem;"><strong>${day}</strong> - ${icon} ${k.nombreCompleto} <br/><span style="font-size:0.7rem; color:#be185d;">${isMaestro?'Maestro':'Alumno'}</span></li>`);
+        });
     }
 
     function showRolDetail(fechaStr) {
@@ -893,12 +929,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const formatRef = (id) => kidsDataMap[id] ? kidsDataMap[id].nombreCompleto : 'Sin Asignar';
         const renderGpoRow = (label, gpoData, color) => {
             if (!gpoData || !gpoData.titular) return '';
-            const auxName = gpoData.auxiliar ? formatRef(gpoData.auxiliar) : '';
+            const titularObj = kidsDataMap[gpoData.titular];
+            const auxObj = gpoData.auxiliar ? kidsDataMap[gpoData.auxiliar] : null;
+            const titleStr = formatRef(gpoData.titular);
+            const auxStr = auxObj ? formatRef(gpoData.auxiliar) : '';
+            
+            const fechaForm = new Date(fechaStr + "T00:00:00").toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            const btnWhatsApp = (maestro, rolTipo) => {
+                if(!maestro || !maestro.celular) return '';
+                const cel = maestro.celular.replace(/\D/g, '');
+                const mUrl = gpoData.link ? ` Aquí tienes el recurso de la clase: ${gpoData.link}` : '';
+                const texto = `Hola Maestro(a) ${maestro.nombreCompleto}, tenemos la bendición de tenerte como maestro ${rolTipo} del ${label} el día ${fechaForm}.${mUrl} ¡Te esperamos, bendiciones!`;
+                
+                return `<a href="https://wa.me/52${cel}?text=${encodeURIComponent(texto)}" target="_blank" class="btn btn-sm" style="background:#22c55e; color:white; padding: 3px 8px; font-size:0.8rem; margin-left:10px;"><i class="fa-brands fa-whatsapp"></i> Notificar</a>`;
+            }
+
             return `
                 <div style="border-bottom: 2px dashed #cbd5e1; padding-bottom: 15px; margin-bottom: 15px;">
                     <strong style="color: ${color}; font-size:1.2rem; font-family: var(--font-heading);"><i class="fa-solid fa-users"></i> ${label}</strong>
-                    <div style="margin-top: 10px; font-family: var(--font-body); font-size:1.1rem;"><strong><i class="fa-solid fa-chalkboard-user"></i> Titular:</strong> ${formatRef(gpoData.titular)}</div>
-                    ${auxName ? `<div style="font-family: var(--font-body); font-size:1.1rem; margin-top:5px;"><strong><i class="fa-solid fa-user-plus"></i> Auxiliar:</strong> ${auxName}</div>` : ''}
+                    <div style="margin-top: 10px; font-family: var(--font-body); font-size:1.1rem; display:flex; align-items:center;"><strong><i class="fa-solid fa-chalkboard-user"></i> Titular:</strong>&nbsp;${titleStr} ${btnWhatsApp(titularObj, 'Titular')}</div>
+                    ${auxObj ? `<div style="font-family: var(--font-body); font-size:1.1rem; margin-top:5px; display:flex; align-items:center;"><strong><i class="fa-solid fa-user-plus"></i> Auxiliar:</strong>&nbsp;${auxStr} ${btnWhatsApp(auxObj, 'Auxiliar')}</div>` : ''}
                     ${gpoData.link ? `<div style="font-family: var(--font-body); margin-top:10px;"><a href="${gpoData.link}" target="_blank" class="btn btn-sm" style="background:#f1f5f9; color:#0f172a; width:100%; text-align:center;"><i class="fa-solid fa-cloud-arrow-down"></i> Descargar Clase</a></div>` : ''}
                 </div>
             `;

@@ -271,9 +271,20 @@
                     <button id="cal-next-month" class="btn" style="background:white; padding:5px 15px;"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
 
-                <div class="sketchy-box" style="padding: 10px; background: #fffcf0;">
-                    <div id="roles-calendar" class="calendar-grid">
-                        <!-- JS fills this with days -->
+                <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                    <!-- Calendario -->
+                    <div class="sketchy-box" style="padding: 10px; background: #fffcf0; flex: 1; min-width: 300px;">
+                        <div id="roles-calendar" class="calendar-grid">
+                            <!-- JS fills this with days -->
+                        </div>
+                    </div>
+
+                    <!-- Cumpleañeros del Mes -->
+                    <div class="sketchy-box" style="flex: 0 0 250px; padding: 20px; background: #fdf2f8; border-color: #ec4899;">
+                        <h3 style="margin-top:0; color: #be185d; border-bottom: 2px dashed #fbcfe8; padding-bottom: 10px;"><i class="fa-solid fa-cake-candles"></i> Cumpleañeros</h3>
+                        <ul id="lista-cumpleaneros" style="list-style: none; padding: 0; margin: 0;">
+                            <!-- JS fills this with birthdays -->
+                        </ul>
                     </div>
                 </div>
             </section>
