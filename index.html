@@ -48,6 +48,17 @@
                 </header>
                 
                 <form id="registro-form" class="sketchy-form">
+                    <!-- Selector de Tipo -->
+                    <div class="form-section type-selector" style="text-align: center; margin-bottom: 20px;">
+                        <div class="input-field radio-group" style="display:inline-block;">
+                            <label style="font-size: 1.2rem;">Tipo de Registro</label>
+                            <div class="radio-options" style="justify-content: center; gap: 20px;">
+                                <label><input type="radio" name="tipoPersona" value="alumno" checked> 👦 Alumno</label>
+                                <label><input type="radio" name="tipoPersona" value="maestro"> 👨‍🏫 Maestro</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-section">
                         <h3><i class="fa-solid fa-id-card"></i> 1. Información Personal</h3>
                         
@@ -59,58 +70,133 @@
                             <input type="file" id="kid-photo" accept="image/*" style="display: none;">
                         </div>
 
+                    <!-- CAMPOS COMUNES -->
                         <div class="input-group">
                             <div class="input-field">
                                 <label>Nombre Completo</label>
-                                <input type="text" placeholder="Ej. Juan Pérez" required class="sketchy-input">
+                                <input type="text" placeholder="Ej. Juan Pérez" id="reg-nombre" required class="sketchy-input">
                             </div>
                             <div class="input-field">
                                 <label>Fecha de Nacimiento</label>
-                                <input type="date" required class="sketchy-input">
+                                <input type="date" id="reg-fecha-nac" required class="sketchy-input">
                             </div>
-                            <div class="input-field radio-group">
-                                <label>Género</label>
-                                <div class="radio-options">
-                                    <label><input type="radio" name="gender" value="boy" checked> 👦 Niño</label>
-                                    <label><input type="radio" name="gender" value="girl"> 👧 Niña</label>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN ALUMNOS -->
+                    <div id="section-alumno">
+                        <div class="form-section">
+                            <div class="input-group">
+                                <div class="input-field radio-group">
+                                    <label>Género</label>
+                                    <div class="radio-options">
+                                        <label><input type="radio" name="gender" value="boy" checked> 👦 Niño</label>
+                                        <label><input type="radio" name="gender" value="girl"> 👧 Niña</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3><i class="fa-solid fa-people-roof"></i> 2. Datos Familiares</h3>
+                            <div class="input-group">
+                                <div class="input-field">
+                                    <label>Nombre del Tutor</label>
+                                    <input type="text" id="reg-tutor" placeholder="Ej. María López" class="sketchy-input">
+                                </div>
+                                <div class="input-field">
+                                    <label>Teléfono de Contacto</label>
+                                    <input type="tel" id="reg-telefono-tutor" placeholder="10 dígitos" class="sketchy-input">
+                                </div>
+                            </div>
+                            <div class="input-group" style="margin-top:10px;">
+                                <div class="input-field" style="width:100%;">
+                                    <label><i class="fa-solid fa-children" style="color:#FF7043;"></i> Vincular con Hermanos</label>
+                                    <p style="font-size:0.8rem; color:#888;">Presiona Ctrl (o Cmd) para seleccionar varios.</p>
+                                    <select id="select-hermanos" multiple class="sketchy-input" style="height: auto; min-height: 100px;">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3><i class="fa-solid fa-stethoscope"></i> 3. Información Médica</h3>
+                            <div class="input-group">
+                                <div class="input-field">
+                                    <label>Alergias Conocidas</label>
+                                    <textarea id="reg-alergias" placeholder="Ninguna" class="sketchy-input"></textarea>
+                                </div>
+                                <div class="input-field">
+                                    <label>Notas Especiales</label>
+                                    <textarea id="reg-notas" placeholder="Condiciones, cuidados especiales..." class="sketchy-input"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-section">
-                        <h3><i class="fa-solid fa-people-roof"></i> 2. Datos Familiares</h3>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label>Nombre del Tutor</label>
-                                <input type="text" placeholder="Ej. María López" class="sketchy-input">
+                    <!-- SECCIÓN MAESTROS -->
+                    <div id="section-maestro" style="display: none;">
+                        <div class="form-section">
+                            <h3><i class="fa-solid fa-address-book"></i> 2. Datos de Contacto</h3>
+                            <div class="input-group">
+                                <div class="input-field">
+                                    <label>Celular</label>
+                                    <input type="tel" id="reg-celular" placeholder="10 dígitos" class="sketchy-input">
+                                </div>
+                                <div class="input-field">
+                                    <label>Correo Electrónico</label>
+                                    <input type="email" id="reg-correo" placeholder="ejemplo@correo.com" class="sketchy-input">
+                                </div>
                             </div>
-                            <div class="input-field">
-                                <label>Teléfono de Contacto</label>
-                                <input type="tel" placeholder="10 dígitos" class="sketchy-input">
+                            <div class="input-group" style="margin-top: 10px;">
+                                <div class="input-field">
+                                    <label>Estado Civil</label>
+                                    <select id="reg-estadocivil" class="sketchy-input">
+                                        <option value="Soltero">Soltero(a)</option>
+                                        <option value="Casado">Casado(a)</option>
+                                        <option value="Divorciado">Divorciado(a)</option>
+                                        <option value="Viudo">Viudo(a)</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="input-group" style="margin-top:10px;">
-                            <div class="input-field" style="width:100%;">
-                                <label><i class="fa-solid fa-children" style="color:#FF7043;"></i> Vincular con Hermanos de la Base de Datos</label>
-                                <p style="font-size:0.8rem; color:#888;">Mantén presionado Ctrl (o Cmd) para seleccionar varios.</p>
-                                <select id="select-hermanos" multiple class="sketchy-input" style="height: auto; min-height: 100px;">
-                                    <!-- Options injected via JavaScript -->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="form-section">
-                        <h3><i class="fa-solid fa-stethoscope"></i> 3. Información Médica</h3>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label>Alergias Conocidas</label>
-                                <textarea placeholder="Ninguna" class="sketchy-input"></textarea>
+                        <div class="form-section">
+                            <h3><i class="fa-solid fa-cross"></i> 3. Perfil Espiritual</h3>
+                            <div class="input-group">
+                                <div class="input-field radio-group">
+                                    <label>¿Está bautizado?</label>
+                                    <div class="radio-options">
+                                        <label><input type="radio" name="bautizado" value="si"> Sí</label>
+                                        <label><input type="radio" name="bautizado" value="no" checked> No</label>
+                                    </div>
+                                </div>
+                                <div class="input-field radio-group">
+                                    <label>¿Tomó Sanidad Interior?</label>
+                                    <div class="radio-options">
+                                        <label><input type="radio" name="sanidad" value="si"> Sí</label>
+                                        <label><input type="radio" name="sanidad" value="no" checked> No</label>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="input-field">
-                                <label>Notas Especiales</label>
-                                <textarea placeholder="Condiciones, cuidados especiales..." class="sketchy-input"></textarea>
+                            
+                            <div class="input-group" style="margin-top:15px; background: #fffcf0; padding:10px; border-radius:10px; border:2px dashed var(--border-color);">
+                                <div class="input-field radio-group" style="width: 100%;">
+                                    <label>¿Tomó Vida Discipular?</label>
+                                    <div class="radio-options" style="margin-bottom: 10px;">
+                                        <label><input type="radio" name="vidadiscipular" value="si" id="vd-si"> Sí</label>
+                                        <label><input type="radio" name="vidadiscipular" value="no" id="vd-no" checked> No</label>
+                                    </div>
+                                    <div id="niveles-vd" style="display:none; transition: all 0.3s;">
+                                        <label style="font-size: 0.9rem; margin-bottom: 5px;">¿Qué niveles ha completado?</label>
+                                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                            <label><input type="checkbox" class="vd-nivel" value="1"> Nivel 1</label>
+                                            <label><input type="checkbox" class="vd-nivel" value="2"> Nivel 2</label>
+                                            <label><input type="checkbox" class="vd-nivel" value="3"> Nivel 3</label>
+                                            <label><input type="checkbox" class="vd-nivel" value="4"> Nivel 4</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -128,9 +214,13 @@
                     <h2 class="rainbow-text">
                         <span>D</span><span>i</span><span>r</span><span>e</span><span>c</span><span>t</span><span>o</span><span>r</span><span>i</span><span>o</span>
                     </h2>
+                    <div style="display:flex; width: 100%; justify-content: center; gap: 10px; margin: 10px 0;">
+                        <button id="tab-alumnos" class="btn btn-blue" style="flex:1;">👦 Alumnos</button>
+                        <button id="tab-maestros" class="btn" style="flex:1; background: #e2e8f0; color: #475569;">👨‍🏫 Maestros</button>
+                    </div>
                     <div class="search-bar sketchy-input">
                         <i class="fa-solid fa-search"></i>
-                        <input type="text" id="search-input" placeholder="Buscar niño...">
+                        <input type="text" id="search-input" placeholder="Buscar...">
                     </div>
                 </div>
 
