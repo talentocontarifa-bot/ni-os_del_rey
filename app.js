@@ -377,8 +377,13 @@ document.addEventListener('DOMContentLoaded', () => {
             photoSizeStyle = "width: 140px; height: 140px; margin-bottom: 6px;";
         }
 
+        // Configuración específica de Maestro o Alumno
+        const isMaestro = data.tipoPersona === 'maestro';
+        const bgImage = isMaestro ? 'assets/Back_credencial_maestro.webp' : 'assets/Back_credencial.webp';
+        const ageGpoText = isMaestro ? `Rol: Maestro(a)` : `${age} años &bull; ${group}`;
+
         let sisText = '';
-        if (data.hermanosVinculados && data.hermanosVinculados.length > 0) {
+        if (!isMaestro && data.hermanosVinculados && data.hermanosVinculados.length > 0) {
             const nombresHerms = data.hermanosVinculados.map(hid => kidsDataMap[hid] ? kidsDataMap[hid].nombreCompleto.split(' ')[0] : '...').join(', ');
             sisText = `
                 <div class="id-siblings-box">
@@ -390,7 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <div class="id-card">
-                <img src="assets/Back_credencial.webp" class="id-card-bg">
+                <img src="${bgImage}" class="id-card-bg">
                 <div class="id-card-content" style="padding: 8px;">
                     <img src="logo.webp" class="id-logo" alt="Niños del Rey">
                     
@@ -400,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <h3 class="id-name" style="${nameStyle}"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
                     <p class="id-number">ID: ${data.idAuto || 'S/N'}</p>
-                    <p class="id-age-gpo">${age} años &bull; ${group}</p>
+                    <p class="id-age-gpo">${ageGpoText}</p>
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; margin-top:auto;">
                         ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div style="max-width:70%;"></div>'}
@@ -528,7 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             
                             <div class="actions-box" style="display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
                                 <button class="btn btn-ficha" style="background:#bae6fd; color:#0369a1; padding:5px 8px; font-size:0.8rem; border:2px solid #0369a1; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-eye"></i> Ficha</button>
-                                ${!isMaestro ? `<button class="btn btn-tarjeta" style="background:#fcf9f2; color:#333; padding:5px 8px; font-size:0.8rem; border:2px solid #333; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-id-badge"></i> Gafete</button>` : ''}
+                                <button class="btn btn-tarjeta" style="background:#fcf9f2; color:#333; padding:5px 8px; font-size:0.8rem; border:2px solid #333; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-id-badge"></i> Gafete</button>
                                 <button class="btn btn-editar" style="background:#fde68a; color:#333; padding:5px 8px; font-size:0.8rem; border:2px solid #333; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-pencil"></i> Editar</button>
                             </div>
                         </div>

@@ -157,7 +157,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 /* Modals & Misc */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 .modal-overlay.active { opacity: 1; pointer-events: all; }
-.modal-content { background: #fff; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px rgba(0,0,0,0.1); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; position: relative; }
+.modal-content { background: #fff; border: 3px solid var(--border-color); box-shadow: 4px 4px 0px rgba(0,0,0,0.1); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; position: relative; max-height: 90vh; overflow-y: auto; }
 .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; font-weight:bold;}
 /* La Tarjeta de Credencial (Diseño Mejorado y Anti-Descuadre) */
 .id-card { 
