@@ -316,8 +316,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // engorda invisiblemente la tarjeta de 280px a 320px y cuando se pegaba
             // al PDF de 280px, la orilla derecha quedaba desbordada/recortada.
             const origShadow = cardElement.style.boxShadow;
+            const origMargin = cardElement.style.margin;
+            
             cardElement.style.boxShadow = 'none';
             cardElement.style.transform = 'none';
+            cardElement.style.margin = '0';
 
 
 
@@ -331,10 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait' }
             };
 
-            // Ejecutamos a traves de html2pdf. Tambien funciona como "html2canvas wrapper"
             html2pdf().set(opt).from(cardElement).save().then(() => {
                 // Devolvemos la sombra a su estado original
                 cardElement.style.boxShadow = origShadow;
+                cardElement.style.margin = origMargin;
             });
         });
     }
