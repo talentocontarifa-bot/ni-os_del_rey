@@ -299,14 +299,19 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         display: none !important; 
     }
     
-    #id-card-modal {
+    /* Anulamos totalmente cualquier padding, margen o borde de los contenedores superiores */
+    #id-card-modal, .modal-content, #id-card-preview {
         display: block !important;
         position: absolute !important;
         top: 0 !important;
         left: 0 !important;
-        background: white !important;
+        width: auto !important;
+        height: auto !important;
+        background: transparent !important;
         margin: 0 !important;
         padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
     }
 
     /* Escondemos la X y el boton de impresion */
@@ -314,28 +319,23 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         display: none !important;
     }
 
-    #id-card-preview {
-        display: block !important;
-        position: static !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* Mantenemos estrictamente los px del diseño de escritorio (70x108mm = 280x432px)*/
+    /* Anclado Supremo al lienzo fisico. 
+       El tamaño se ancla exactamente al tamaño provisto por @page */
     .id-card {
-        width: 280px !important;
-        height: 432px !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 70mm !important;
+        height: 108mm !important;
         max-width: none !important;
         max-height: none !important;
         margin: 0 !important;
-        padding: 40px 20px 20px 20px !important; /* Mismo margen que UI web */
+        /* Padding milimétrico proporcional a los paddings originales de px */
+        padding: 10mm 5mm 5mm 5mm !important; 
         box-shadow: none !important;
         page-break-inside: avoid;
         page-break-after: avoid;
-        /* La magia: 280px miden fisicamente 74mm. Para que entren en la hoja @page de 70mm sin rebosar 
-           a las paginas 2 y 3, reducimos el contenedor entero al 94.4% de su tamaño exacto. */
-        transform: scale(0.944) !important; 
-        transform-origin: top left !important;
+        transform: none !important; 
     }
 
     .id-card-content {
