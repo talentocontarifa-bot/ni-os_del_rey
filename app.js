@@ -132,6 +132,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Toggle de UI Alumno/Maestro
+    const radiostipoPersona = document.querySelectorAll('input[name="tipoPersona"]');
+    const secAlumno = document.getElementById('section-alumno');
+    const secMaestro = document.getElementById('section-maestro');
+    const titleRegistro = document.querySelector('.purple-header h2');
+
+    radiostipoPersona.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if(e.target.value === 'maestro') {
+                secAlumno.style.display = 'none';
+                secMaestro.style.display = 'block';
+                titleRegistro.innerHTML = '<i class="fa-solid fa-chalkboard-user"></i> Registro de Nuevo Maestro';
+            } else {
+                secAlumno.style.display = 'block';
+                secMaestro.style.display = 'none';
+                titleRegistro.innerHTML = '<i class="fa-solid fa-child-reaching"></i> Registro de Nuevo Niño';
+            }
+        });
+    });
+
+    // Toggle de Niveles Vida Discipular
+    const radiosVd = document.querySelectorAll('input[name="vidadiscipular"]');
+    const panelNivelesVd = document.getElementById('niveles-vd');
+    radiosVd.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if(e.target.value === 'si') {
+                panelNivelesVd.style.display = 'block';
+            } else {
+                panelNivelesVd.style.display = 'none';
+                // Reset checks
+                document.querySelectorAll('.vd-nivel').forEach(cb => cb.checked = false);
+            }
+        });
+    });
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -141,27 +176,50 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
 
         try {
-            // Recolectar datos
-            const fullName = form.querySelector('input[placeholder="Ej. Juan Pérez"]').value;
-            const birthDate = form.querySelector('input[type="date"]').value;
-            const gender = form.querySelector('input[name="gender"]:checked').value;
-            const tutorName = form.querySelector('input[placeholder="Ej. María López"]').value || "";
-            const phone = form.querySelector('input[type="tel"]').value || "";
-            const allergies = form.querySelectorAll('textarea')[0].value || "";
-            const notes = form.querySelectorAll('textarea')[1].value || "";
+            const tipoPersona = form.querySelector('input[name="tipoPersona"]:checked').value;
+            const fullName = document.getElementById('reg-nombre').value;
+            const birthDate = document.getElementById('reg-fecha-nac').value;
             
-            const selectHermanos = document.getElementById('select-hermanos');
-            const vinculados = Array.from(selectHermanos.selectedOptions).map(opt => opt.value);
+            let dataToSave = {
+                tipoPersona: tipoPersona,
+                nombreCompleto: fullName,
+                fechaNacimiento: birthDate,
+            };
+
+            if (tipoPersona === 'alumno') {
+                const gender = form.querySelector('input[name="gender"]:checked').value;
+                const tutorName = document.getElementById('reg-tutor').value || "";
+                const phone = document.getElementById('reg-telefono-tutor').value || "";
+                const allergies = document.getElementById('reg-alergias').value || "";
+                const notes = document.getElementById('reg-notas').value || "";
+                
+                const selectHermanos = document.getElementById('select-hermanos');
+                const vinculados = Array.from(selectHermanos.selectedOptions).map(opt => opt.value);
+                
+                dataToSave = { ...dataToSave, genero: gender, tutor: tutorName, telefono: phone, alergias: allergies, notasEspeciales: notes, hermanosVinculados: vinculados };
+            } else {
+                const celular = document.getElementById('reg-celular').value || "";
+                const correo = document.getElementById('reg-correo').value || "";
+                const estadoCivil = document.getElementById('reg-estadocivil').value;
+                const bautizado = form.querySelector('input[name="bautizado"]:checked').value;
+                const sanidad = form.querySelector('input[name="sanidad"]:checked').value;
+                const vdData = form.querySelector('input[name="vidadiscipular"]:checked').value;
+                
+                let vdNiveles = [];
+                if (vdData === 'si') {
+                    vdNiveles = Array.from(document.querySelectorAll('.vd-nivel:checked')).map(cb => cb.value);
+                }
+                
+                dataToSave = { ...dataToSave, celular, correo, estadoCivil, bautizado, sanidadInterior: sanidad, vidaDiscipular: vdData, vidaDiscipularNiveles: vdNiveles };
+            }
 
             let photoUrl = null;
             const file = photoInput.files[0];
 
-            // "Despedazar la imagen": Comprimirla a Base64 sin usar Firebase Storage (Evita problemas de CORS)
             if (file) {
                 photoUrl = await compressImageToBase64(file);
             }
 
-            // Autogenerar ID si no tiene (Formato secuencial NDR_01, NDR_02...)
             let autoId = null;
             if(currentEditId && kidsDataMap[currentEditId]) {
                 autoId = kidsDataMap[currentEditId].idAuto;
@@ -170,7 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 let maxNum = 0;
                 Object.values(kidsDataMap).forEach(kid => {
                     if (kid.idAuto) {
-                        // Extraemos el número final sea NDR_05 o NDR-05
                         const matchCounter = kid.idAuto.match(/\d+/);
                         if (matchCounter) {
                             const num = parseInt(matchCounter[0], 10);
@@ -180,24 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 });
-                // PadStart asegura que empiece con 0 si es menor a 10 (ej. "01", "02")
                 autoId = 'NDR_' + String(maxNum + 1).padStart(2, '0');
             }
+            dataToSave.idAuto = autoId;
 
-            // Armamos el diccionario de actualización
-            const dataToSave = {
-                idAuto: autoId,
-                nombreCompleto: fullName,
-                fechaNacimiento: birthDate,
-                genero: gender,
-                tutor: tutorName,
-                telefono: phone,
-                alergias: allergies,
-                notasEspeciales: notes,
-                hermanosVinculados: vinculados
-            };
-
-            // Solo actualizar/sobreescribir la url de la foto si subieron una foto nueva
+            // Solo actualizar la foto si subieron nueva
             if(photoUrl) {
                 dataToSave.foto = photoUrl;
             }
@@ -231,25 +275,45 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = kidsDataMap[id];
         if(!data) return;
         
-        const { age, group } = getAgeAndGroup(data.fechaNacimiento);
         const avatar = data.foto || `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${encodeURIComponent(data.nombreCompleto)}`;
-        
-        document.getElementById('info-preview').innerHTML = `
+        const baseHTML = `
             <div style="display:flex; gap:15px; align-items:center; margin-bottom:15px; border-bottom:3px solid #eee; padding-bottom:15px;">
                 <img src="${avatar}" style="width:80px;height:80px;border-radius:50%;border:3px solid #333; object-fit:cover;">
                 <div>
                     <h2 style="margin:0; font-family:'Fredoka One'; color:#3b82f6; font-size:1.6rem; line-height:1.1;">${data.nombreCompleto}</h2>
-                    <p style="margin:5px 0 0 0; color:#666;">ID: ${data.idAuto || 'N/A'} <span style="margin-left:5px; background:#fde68a; padding:3px 10px; border-radius:12px; font-weight:700; font-size:0.8rem; border:2px solid #333; color:#333;">${group}</span></p>
+                    <p style="margin:5px 0 0 0; color:#666;">ID: ${data.idAuto || 'N/A'}</p>
                 </div>
-            </div>
+            </div>`;
+            
+        let bodyHTML = '';
+
+        if (data.tipoPersona === 'maestro') {
+            const { age } = getAgeAndGroup(data.fechaNacimiento);
+            const vdText = data.vidaDiscipular === 'si' ? `Sí (Niveles: ${data.vidaDiscipularNiveles ? data.vidaDiscipularNiveles.join(', ') : 'Ninguno'})` : 'No';
+            bodyHTML = `
             <div style="font-size:1.05rem; line-height:1.6;">
+                <p><strong><i class="fa-solid fa-cake-candles" style="color:#ec4899; width:20px;"></i> Edad:</strong> ${age} años (Nace: ${data.fechaNacimiento || 'N/A'})</p>
+                <p><strong><i class="fa-solid fa-phone" style="color:#10b981; width:20px;"></i> Celular:</strong> <a href="tel:${data.celular}" style="color:#10b981; text-decoration:none; font-weight:700;">${data.celular || 'No registrado'}</a></p>
+                <p><strong><i class="fa-solid fa-envelope" style="color:#3b82f6; width:20px;"></i> Correo:</strong> ${data.correo || 'No registrado'}</p>
+                <p><strong><i class="fa-solid fa-ring" style="color:#f59e0b; width:20px;"></i> Estado Civil:</strong> ${data.estadoCivil || 'N/A'}</p>
+                <p><strong><i class="fa-solid fa-droplet" style="color:#38bdf8; width:20px;"></i> Bautizado:</strong> <span style="text-transform: capitalize;">${data.bautizado || 'N/A'}</span></p>
+                <p><strong><i class="fa-solid fa-book-bible" style="color:#a855f7; width:20px;"></i> Vida Discipular:</strong> ${vdText}</p>
+                <p><strong><i class="fa-solid fa-heart-circle-check" style="color:#f43f5e; width:20px;"></i> Sanidad Interior:</strong> <span style="text-transform: capitalize;">${data.sanidadInterior || 'N/A'}</span></p>
+            </div>`;
+        } else {
+            const { age, group } = getAgeAndGroup(data.fechaNacimiento);
+            bodyHTML = `
+            <div style="font-size:1.05rem; line-height:1.6;">
+                <p><strong><i class="fa-solid fa-users-rectangle" style="color:#4f46e5; width:20px;"></i> Grupo:</strong> ${group}</p>
                 <p><strong><i class="fa-solid fa-cake-candles" style="color:#ec4899; width:20px;"></i> Edad:</strong> ${age} años (Nace: ${data.fechaNacimiento || 'N/A'})</p>
                 <p><strong><i class="fa-solid fa-person-breastfeeding" style="color:#a855f7; width:20px;"></i> Tutor:</strong> ${data.tutor || 'No registrado'}</p>
                 <p><strong><i class="fa-solid fa-phone" style="color:#10b981; width:20px;"></i> Teléfono:</strong> <a href="tel:${data.telefono}" style="color:#10b981; text-decoration:none; font-weight:700;">${data.telefono || 'No registrado'}</a></p>
                 <p><strong><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; width:20px;"></i> Alergias:</strong> <span style="color:#ef4444;">${data.alergias || 'Ninguna declarada'}</span></p>
                 <p><strong><i class="fa-solid fa-clipboard" style="color:#f59e0b; width:20px;"></i> Notas extra:</strong> ${data.notasEspeciales || 'Ninguna'}</p>
-            </div>
-        `;
+            </div>`;
+        }
+
+        document.getElementById('info-preview').innerHTML = baseHTML + bodyHTML;
         document.getElementById('info-modal').classList.add('active');
     }
 
@@ -326,7 +390,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // === 2. DIRECTORIO EN TIEMPO REAL (FIREBASE) ===
     const directoryList = document.querySelector('.directory-list');
     let isInitialLoadDone = false;
-    
+    // TABS DEL DIRECTORIO
+    let currentDirTab = 'alumno';
+    const tabAlumnos = document.getElementById('tab-alumnos');
+    const tabMaestros = document.getElementById('tab-maestros');
+
+    function applyDirectoryFilter() {
+        const cards = directoryList.querySelectorAll('.kid-card');
+        const searchTerm = document.getElementById('search-input').value.toLowerCase();
+        
+        cards.forEach(card => {
+            const cardData = kidsDataMap[card.getAttribute('data-id')];
+            if(!cardData) return;
+            const type = cardData.tipoPersona || 'alumno'; // defaults to child
+            const matchesTab = type === currentDirTab;
+            const matchesSearch = cardData.nombreCompleto.toLowerCase().includes(searchTerm);
+            
+            card.style.display = (matchesTab && matchesSearch) ? 'block' : 'none';
+        });
+    }
+
+    if (tabAlumnos && tabMaestros) {
+        tabAlumnos.addEventListener('click', () => {
+            currentDirTab = 'alumno';
+            tabAlumnos.className = 'btn btn-blue';
+            tabAlumnos.style.background = ''; tabAlumnos.style.color = '';
+            tabMaestros.className = 'btn';
+            tabMaestros.style.background = '#e2e8f0'; tabMaestros.style.color = '#475569';
+            applyDirectoryFilter();
+        });
+        tabMaestros.addEventListener('click', () => {
+            currentDirTab = 'maestro';
+            tabMaestros.className = 'btn btn-blue';
+            tabMaestros.style.background = ''; tabMaestros.style.color = '';
+            tabAlumnos.className = 'btn';
+            tabAlumnos.style.background = '#e2e8f0'; tabAlumnos.style.color = '#475569';
+            applyDirectoryFilter();
+        });
+    }
+
+    // Buscador
+    document.getElementById('search-input').addEventListener('input', applyDirectoryFilter);
+
     onSnapshot(collection(db, "ninos"), (snapshot) => {
         if (!isInitialLoadDone && !snapshot.empty) {
             directoryList.innerHTML = ''; 
@@ -337,18 +442,27 @@ document.addEventListener('DOMContentLoaded', () => {
             kidsDataMap[change.doc.id] = childData; // Guardar copia local en memoria
 
             if (change.type === "added" || change.type === "modified") {
+                const isMaestro = childData.tipoPersona === 'maestro';
                 const { age, group } = getAgeAndGroup(childData.fechaNacimiento);
                 
                 let avatarUrl = childData.foto ? childData.foto : `https://api.dicebear.com/7.x/fun-emoji/svg?seed=${childData.nombreCompleto.replace(/ /g, '')}`;
                 
                 let bgColor = '#f9f6ea';
-                if(group === 'Gpo 1') bgColor = '#f4b4b9'; // Pink
-                else if(group === 'Gpo 2') bgColor = '#b1d8a4'; // Green
-                else if(group === 'Gpo 3') bgColor = '#a2ccec'; // Blue
-                else bgColor = '#fde68a'; // Amarillo
+                if(isMaestro) {
+                    bgColor = '#cbd5e1'; // Gris azulado para maestros
+                } else {
+                    if(group === 'Gpo 1') bgColor = '#f4b4b9'; // Pink
+                    else if(group === 'Gpo 2') bgColor = '#b1d8a4'; // Green
+                    else if(group === 'Gpo 3') bgColor = '#a2ccec'; // Blue
+                    else bgColor = '#fde68a'; // Amarillo
+                }
                 
                 let idText = childData.idAuto || 'NDR_??';
-                let sisBroIcon = (childData.hermanosVinculados && childData.hermanosVinculados.length > 0) ? '<i class="fa-solid fa-children" style="color:#222; margin-left:8px;" title="Tiene hermanos"></i>' : '';
+                let sisBroIcon = (!isMaestro && childData.hermanosVinculados && childData.hermanosVinculados.length > 0) ? '<i class="fa-solid fa-children" style="color:#222; margin-left:8px;" title="Tiene hermanos"></i>' : '';
+
+                const extraInfoHtml = isMaestro 
+                    ? `<p><strong>${age}</strong> años <span class="dot"></span> Rol: <strong>Maestro(a)</strong></p>` 
+                    : `<p><strong>${age}</strong> años <span class="dot"></span> Clase: <strong>${group}</strong></p>`;
 
                 const cardHtml = `
                     <div class="kid-card" data-id="${change.doc.id}" style="background-color: ${bgColor};">
@@ -364,12 +478,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="kid-info">
                                 <h4>${childData.nombreCompleto} ${sisBroIcon}</h4>
                                 <p style="font-size:0.9rem; color:#444;">ID: <strong>${idText}</strong></p>
-                                <p><strong>${age}</strong> años <span class="dot"></span> Clase: <strong>${group}</strong></p>
+                                ${extraInfoHtml}
                             </div>
                             
                             <div class="actions-box" style="display:flex; gap:5px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
                                 <button class="btn btn-ficha" style="background:#bae6fd; color:#0369a1; padding:5px 8px; font-size:0.8rem; border:2px solid #0369a1; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-eye"></i> Ficha</button>
-                                <button class="btn btn-tarjeta" style="background:#fcf9f2; color:#333; padding:5px 8px; font-size:0.8rem; border:2px solid #333; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-id-badge"></i> Gafete</button>
+                                ${!isMaestro ? `<button class="btn btn-tarjeta" style="background:#fcf9f2; color:#333; padding:5px 8px; font-size:0.8rem; border:2px solid #333; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-id-badge"></i> Gafete</button>` : ''}
                                 <button class="btn btn-editar" style="background:#fde68a; color:#333; padding:5px 8px; font-size:0.8rem; border:2px solid #333; box-shadow:2px 2px 0px rgba(0,0,0,0.1);"><i class="fa-solid fa-pencil"></i> Editar</button>
                             </div>
                         </div>
@@ -396,8 +510,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!isInitialLoadDone && kidIdFromUrl && kidsDataMap[kidIdFromUrl]) {
             showFichaForKid(kidIdFromUrl);
         }
-        
         isInitialLoadDone = true;
+
+        // Apply visual filtering logic 
+        applyDirectoryFilter();
 
         // Renderizar o refrescar el selector de familia
         renderSiblingsDropdown();
@@ -468,28 +584,57 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Cambiar al modo de edición 
                 currentEditId = id;
                 document.querySelector('.purple-header h2').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editando Registro';
-                form.querySelector('button[type="submit"]').innerHTML = 'Actualizar Registro';
-
                 // Llenar los inputs con la información en memoria
-                form.querySelector('input[placeholder="Ej. Juan Pérez"]').value = data.nombreCompleto || "";
-                form.querySelector('input[type="date"]').value = data.fechaNacimiento || "";
+                document.getElementById('reg-nombre').value = data.nombreCompleto || "";
+                document.getElementById('reg-fecha-nac').value = data.fechaNacimiento || "";
                 
-                // Mapear género y check de hermanos
-                if(data.genero === "boy" || data.genero === "girl") {
-                    form.querySelector(`input[name="gender"][value="${data.genero}"]`).checked = true;
-                }
-                
-                // Actualizar hermanos visualmente en el DOM (re render excluye a el mismo)
-                renderSiblingsDropdown();
-                const hermanitosArr = data.hermanosVinculados || [];
-                Array.from(document.getElementById('select-hermanos').options).forEach(opt => {
-                    opt.selected = hermanitosArr.includes(opt.value);
-                });
+                if (data.tipoPersona === 'maestro') {
+                    // Cargar Master Data
+                    form.querySelector('input[name="tipoPersona"][value="maestro"]').checked = true;
+                    form.querySelector('input[name="tipoPersona"][value="maestro"]').dispatchEvent(new Event('change'));
+                    
+                    document.getElementById('reg-celular').value = data.celular || "";
+                    document.getElementById('reg-correo').value = data.correo || "";
+                    document.getElementById('reg-estadocivil').value = data.estadoCivil || "Soltero";
+                    
+                    if(data.bautizado) form.querySelector(`input[name="bautizado"][value="${data.bautizado}"]`).checked = true;
+                    if(data.sanidadInterior) form.querySelector(`input[name="sanidad"][value="${data.sanidadInterior}"]`).checked = true;
+                    
+                    if(data.vidaDiscipular) {
+                        const vdRadio = form.querySelector(`input[name="vidadiscipular"][value="${data.vidaDiscipular}"]`);
+                        if(vdRadio) {
+                            vdRadio.checked = true;
+                            vdRadio.dispatchEvent(new Event('change'));
+                        }
+                    }
+                    if(data.vidaDiscipularNiveles) {
+                        Array.from(document.querySelectorAll('.vd-nivel')).forEach(cb => {
+                            cb.checked = data.vidaDiscipularNiveles.includes(cb.value);
+                        });
+                    }
+                    
+                } else {
+                    // Cargar Kid Data
+                    form.querySelector('input[name="tipoPersona"][value="alumno"]').checked = true;
+                    form.querySelector('input[name="tipoPersona"][value="alumno"]').dispatchEvent(new Event('change'));
+                    
+                    // Mapear género y check de hermanos
+                    if(data.genero === "boy" || data.genero === "girl") {
+                        form.querySelector(`input[name="gender"][value="${data.genero}"]`).checked = true;
+                    }
+                    
+                    // Actualizar hermanos visualmente en el DOM (re render excluye a el mismo)
+                    renderSiblingsDropdown();
+                    const hermanitosArr = data.hermanosVinculados || [];
+                    Array.from(document.getElementById('select-hermanos').options).forEach(opt => {
+                        opt.selected = hermanitosArr.includes(opt.value);
+                    });
 
-                form.querySelector('input[placeholder="Ej. María López"]').value = data.tutor || "";
-                form.querySelector('input[type="tel"]').value = data.telefono || "";
-                form.querySelectorAll('textarea')[0].value = data.alergias || "";
-                form.querySelectorAll('textarea')[1].value = data.notasEspeciales || "";
+                    document.getElementById('reg-tutor').value = data.tutor || "";
+                    document.getElementById('reg-telefono-tutor').value = data.telefono || "";
+                    document.getElementById('reg-alergias').value = data.alergias || "";
+                    document.getElementById('reg-notas').value = data.notasEspeciales || "";
+                }
 
                 // Previsualizar la foto actual si existe
                 if(data.foto) {
