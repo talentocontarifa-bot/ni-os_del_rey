@@ -328,9 +328,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 margin:       0,
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
-                // scale 4 para ultra definicion, background asegura que las rendijas esten pintadas
-                html2canvas:  { scale: 4, useCORS: true, backgroundColor: '#ffffff' },
-                // Mantenemos 280x372 pixeles exactos. Al haber apagado shadow, deberia encajar perfecto.
+                // Bloqueamos absolutamente el lienzo al tamaño exacto de la tarjeta (280x372).
+                // Esto guillotina la sangria invisible y elimina el odioso marco blanco en el render.
+                html2canvas:  { 
+                    scale: 4, 
+                    useCORS: true, 
+                    backgroundColor: '#ffffff',
+                    width: 280,
+                    height: 372,
+                    windowWidth: 280,
+                    windowHeight: 372
+                },
                 jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait' }
             };
 
