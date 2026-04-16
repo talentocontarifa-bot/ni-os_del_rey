@@ -130,6 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentEditId = null;
         form.querySelector('button[type="submit"]').innerHTML = 'Guardar Registro';
         document.querySelector('.purple-header h2').innerHTML = '<i class="fa-solid fa-child-reaching"></i> Registro de Nuevo Niño';
+        
+        // Reset manual UI of tipoPersona to 'alumno'
+        const radioAlumno = form.querySelector('input[name="tipoPersona"][value="alumno"]');
+        if (radioAlumno) radioAlumno.checked = true;
+        document.getElementById('section-alumno').style.display = 'block';
+        document.getElementById('section-maestro').style.display = 'none';
     });
 
     // Función para "despedazar" y comprimir imagen a Base64
