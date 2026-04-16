@@ -161,14 +161,16 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; font-weight:bold;}
 /* La Tarjeta de Credencial (Diseño Mejorado y Anti-Descuadre) */
 .id-card { 
-    /* Dimensiones reducidas exactas conservando proporcion 6.99 x 10.8 cm (aprox 11:17) */
-    width: 275px; 
-    height: 425px; 
+    /* Dimensiones reducidas exactas conservando proporcion 70 x 108 mm (280x432 pixeles) */
+    width: 280px; 
+    height: 432px; 
     /* Agregamos el fondo oficial exportado por el cliente */
-    background: url('assets/Back_credencial.webp') no-repeat center center;
+    background-image: url('assets/Back_credencial.webp');
+    background-position: center;
+    background-repeat: no-repeat;
     background-size: 100% 100%;
     /* Margen interno considerable ("buen margen hacia adentro") para respetar el contorno del diseño base */
-    padding: 35px 20px 20px 20px; 
+    padding: 40px 20px 20px 20px; 
     border-radius: 12px; /* Redondeado ajustado */
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     margin: 0 auto; 
