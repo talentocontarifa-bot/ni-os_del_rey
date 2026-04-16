@@ -206,11 +206,11 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     box-shadow: none;
 }
 
-.id-card-content .id-logo { height: 42px; margin-bottom: 5px; position:relative; z-index:2; border:none; object-fit:contain; border-radius:0; width:auto;}
+.id-card-content .id-logo { height: 60px; margin-bottom: 8px; position:relative; z-index:2; border:none; object-fit:contain; border-radius:0; width:auto;}
 .id-church-name { font-size: 0.55rem; color: #6b21a8; font-weight: 700; margin: 0 0 10px 0; letter-spacing: 0.5px; text-transform:uppercase;}
 
 .id-photo-container {
-    width: 130px; height: 130px; /* <--- Foto mas grande! */
+    width: 155px; height: 155px; /* Casi el doble de grande */
     border-radius: 50%;
     padding: 4px;
     background: transparent;
@@ -227,9 +227,16 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
 }
 .id-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
-.id-name { font-family: 'Fredoka One', cursive; margin: 0; font-size: 1.45rem; text-align:center; line-height: 1.1; letter-spacing: 0.5px;}
-.id-name .firstname { color: #ec4899; } 
-.id-name .lastname { color: #0ea5e9; } 
+.id-name { font-family: 'Fredoka One', cursive; margin: 0; font-size: 1.75rem; font-weight: 900; text-align:center; line-height: 1.1; letter-spacing: 0px;}
+/* synthetic bold for Fredoka One if the browser supports it, or text-stroke as fallback for extra fatness */
+@supports (-webkit-text-stroke: 1px black) {
+    .id-name .firstname { color: #ec4899; -webkit-text-stroke: 1px #ec4899; } 
+    .id-name .lastname { color: #0ea5e9; -webkit-text-stroke: 1px #0ea5e9; } 
+}
+@supports not (-webkit-text-stroke: 1px black) {
+    .id-name .firstname { color: #ec4899; } 
+    .id-name .lastname { color: #0ea5e9; } 
+}
 
 .id-number { font-size: 0.85rem; color: #444; margin: 4px 0 2px 0; font-weight:700; background: #f1f5f9; padding: 2px 8px; border-radius: 10px;}
 .id-age-gpo { font-size: 1rem; color: #0284c7; font-weight: bold; margin: 0 0 10px 0; }
@@ -242,6 +249,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     color: #ea580c;
     font-size: 0.65rem;
     font-weight: 700;
+    margin-top: auto; /* Empuja el contenedor de hermanos al fondo disponible de la credencial */
     display: flex;
     align-items: center;
     justify-content: flex-start;
