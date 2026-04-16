@@ -328,14 +328,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 margin:       0, // Sin margenes
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
+                // APAGADO BRUTAL del generador de multipaginas para forzar todo en una sola vista
+                pagebreak:    { mode: ['avoid-all'] },
                 html2canvas:  { 
                     scale: 4, 
                     useCORS: true, 
                     backgroundColor: null 
                 },
-                // Retornamos a unidad PX (pixel-perfect matching) para aniquilar el bug de des-escala de la hoja.
-                // 280x432 px es exactamente proporcional a 70x108 mm. Al imprimirlo saldra inquebrantable.
-                jsPDF:        { unit: 'px', format: [280, 432], orientation: 'portrait' }
+                // Le damos 2 pixeles (434px en lugar de 432px) de "aire" en la altura para que el PDF ni de chiste 
+                // piense que la imagen es mas alta de lo soportado.
+                jsPDF:        { unit: 'px', format: [280, 434], orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(cardElement).save().then(() => {
