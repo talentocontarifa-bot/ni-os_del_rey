@@ -281,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <div class="id-card">
+                <img src="assets/Back_credencial.webp" class="id-card-bg">
                 <div class="id-card-content" style="padding: 8px;">
                     <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 48px; margin-bottom: 2px;">
                     
