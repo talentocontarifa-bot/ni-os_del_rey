@@ -319,9 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cardElement.style.boxShadow = 'none';
             cardElement.style.transform = 'none';
 
-            const origShadow = cardElement.style.boxShadow;
-            cardElement.style.boxShadow = 'none';
-            cardElement.style.transform = 'none';
+
 
             const opt = {
                 margin:       0,
