@@ -283,15 +283,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="id-card">
                 <img src="assets/Back_credencial.webp" class="id-card-bg">
                 <div class="id-card-content" style="padding: 8px;">
-                    <img src="logo.webp" class="id-logo" alt="Niños del Rey" style="height: 48px; margin-bottom: 2px;">
+                    <img src="logo.webp" class="id-logo" alt="Niños del Rey">
                     
-                    <div class="id-photo-container" style="width:85px; height:85px; margin-bottom:8px;">
+                    <div class="id-photo-container">
                         <img src="${avatar}" class="id-photo" alt="Foto">
                     </div>
                     
-                    <h3 class="id-name" style="font-size:1.15rem; margin-top:2px; margin-bottom:2px;"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
-                    <p class="id-number" style="font-size:0.75rem; margin-top: 2px;">ID: ${data.idAuto || 'S/N'}</p>
-                    <p class="id-age-gpo" style="font-size:0.85rem; margin-bottom: 3px;">${age} años &bull; ${group}</p>
+                    <h3 class="id-name"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
+                    <p class="id-number">ID: ${data.idAuto || 'S/N'}</p>
+                    <p class="id-age-gpo">${age} años &bull; ${group}</p>
                     
                     <div style="display:flex; justify-content:space-between; align-items:flex-end; width:100%; margin-top:auto;">
                         ${sisText ? `<div style="max-width:70%;">${sisText}</div>` : '<div style="max-width:70%;"></div>'}
