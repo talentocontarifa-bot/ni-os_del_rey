@@ -325,21 +325,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             const opt = {
-                margin:       0,
+                margin:       [-2, -2, -2, -2], // Sangria negativa (bleed) para guillotinar el marco blanco
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
-                // Bloqueamos absolutamente el lienzo al tamaño exacto de la tarjeta (280x372).
-                // Esto guillotina la sangria invisible y elimina el odioso marco blanco en el render.
+                // scale 4 para ultra definicion
                 html2canvas:  { 
                     scale: 4, 
                     useCORS: true, 
-                    backgroundColor: '#ffffff',
-                    width: 280,
-                    height: 372,
-                    windowWidth: 280,
-                    windowHeight: 372
+                    backgroundColor: '#ffffff'
                 },
-                jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait' }
+                // Reducimos el lienzo 4 pixeles exactos para que la imagen se estire 2px hacia afuera en cada lado
+                jsPDF:        { unit: 'px', format: [276, 368], orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(cardElement).save().then(() => {
