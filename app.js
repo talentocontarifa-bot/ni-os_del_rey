@@ -302,50 +302,24 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // Setup Download PDF logic using html2pdf
+    // Setup Download PDF logic: Regresamos a NATIVO (Print Dialog del SO)
     const btnDownloadPdf = document.getElementById('btn-download-pdf');
     if(btnDownloadPdf) {
+        btnDownloadPdf.innerHTML = '<i class="fa-solid fa-print"></i> Imprimir Credencial';
         btnDownloadPdf.addEventListener('click', () => {
-            const cardElement = document.querySelector('#id-card-preview .id-card');
-            if(!cardElement) return;
+            const btn = document.getElementById('btn-download-pdf');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Abriendo Impresora...';
+            btn.disabled = true;
 
-            const nameElement = cardElement.querySelector('.firstname');
-            const docName = nameElement ? nameElement.innerText.replace(/[^a-z0-9_]/gi, '') : 'Credencial';
-            
-            // Blindaje Titanio Absoluto: Regreso a lo nativo
-            // Quitamos la sombra momentaneamente. Esto es crucial porque la sombra
-            // engorda invisiblemente la tarjeta de 280px a 320px y cuando se pegaba
-            // al PDF de 280px, la orilla derecha quedaba desbordada/recortada.
-            const origShadow = cardElement.style.boxShadow;
-            const origMargin = cardElement.style.margin;
-            
-            cardElement.style.boxShadow = 'none';
-            cardElement.style.transform = 'none';
-            cardElement.style.margin = '0';
-
-
-
-            const opt = {
-                margin:       0, // Sin margenes
-                filename:     `Credencial_NDR_${docName}.pdf`,
-                image:        { type: 'jpeg', quality: 1 },
-                // APAGADO BRUTAL del generador de multipaginas para forzar todo en una sola vista
-                pagebreak:    { mode: ['avoid-all'] },
-                html2canvas:  { 
-                    scale: 4, 
-                    useCORS: true, 
-                    backgroundColor: null 
-                },
-                // Le damos 2 pixeles (434px en lugar de 432px) de "aire" en la altura para que el PDF ni de chiste 
-                // piense que la imagen es mas alta de lo soportado.
-                jsPDF:        { unit: 'px', format: [280, 434], orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(cardElement).save().then(() => {
-                // Devolvemos la sombra a su estado original
-                cardElement.style.boxShadow = origShadow;
-                cardElement.style.margin = origMargin;
-            });
+            // Damos tiempecito para que el boton ponga su feedback visual
+            setTimeout(() => {
+                // LLAMADA NATIVA: Perfecta calidad, el navegador respeta SVG's, WebP originales y el contorno
+                window.print();
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 300);
         });
     }
 
