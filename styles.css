@@ -164,11 +164,8 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     /* Dimensiones reducidas exactas conservando proporcion 70 x 108 mm (280x432 pixeles) */
     width: 280px; 
     height: 432px; 
-    /* Agregamos el fondo oficial exportado por el cliente */
-    background-image: url('assets/Back_credencial.webp');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
+    /* Fondo removido y trasladado a un IMG absoluto para evitar el brutal downgrade de resolucion de html2canvas */
+    background: transparent;
     /* Margen interno considerable ("buen margen hacia adentro") para respetar el contorno del diseño base */
     padding: 40px 20px 20px 20px; 
     border-radius: 12px; /* Redondeado ajustado */
@@ -179,6 +176,18 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
     overflow: hidden;
     display: flex;
     box-sizing: border-box;
+}
+
+/* El elemento fantasma absoluto que evita que html2canvas destruya la calidad */
+.id-card-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    object-fit: fill; /* fill para que respete el 100x100 */
+    pointer-events: none;
 }
 
 .id-card-content { 
