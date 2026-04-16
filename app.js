@@ -319,32 +319,24 @@ document.addEventListener('DOMContentLoaded', () => {
             cardElement.style.boxShadow = 'none';
             cardElement.style.transform = 'none';
 
-            html2canvas(cardElement, {
-                scale: 4, // 4x Resolucion Ultra HD
-                useCORS: true,
-                backgroundColor: '#ffffff'
-            }).then(canvas => {
-                // Devolvemos la sombra
+            const origShadow = cardElement.style.boxShadow;
+            cardElement.style.boxShadow = 'none';
+            cardElement.style.transform = 'none';
+
+            const opt = {
+                margin:       0,
+                filename:     `Credencial_NDR_${docName}.pdf`,
+                image:        { type: 'jpeg', quality: 1 },
+                // scale 4 para ultra definicion, background asegura que las rendijas esten pintadas
+                html2canvas:  { scale: 4, useCORS: true, backgroundColor: '#ffffff' },
+                // Mantenemos 280x372 pixeles exactos. Al haber apagado shadow, deberia encajar perfecto.
+                jsPDF:        { unit: 'px', format: [280, 372], orientation: 'portrait' }
+            };
+
+            // Ejecutamos a traves de html2pdf. Tambien funciona como "html2canvas wrapper"
+            html2pdf().set(opt).from(cardElement).save().then(() => {
+                // Devolvemos la sombra a su estado original
                 cardElement.style.boxShadow = origShadow;
-
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
-                
-                // Dimensiones exactas matematicas: Ancho 70 milimetros
-                const mmWidth = 70;
-                // Calculamos la altura basandonos en los pixeles reales capturados (aprox 93mm)
-                // esto imposibilita cortes o desfaces porque el lienzo abraza la foto de forma dinamica.
-                const mmHeight = (canvas.height / canvas.width) * mmWidth;
-
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: [mmWidth, mmHeight],
-                    compress: true
-                });
-
-                // Pegamos sin offsets: x=0, y=0
-                pdf.addImage(imgData, 'JPEG', 0, 0, mmWidth, mmHeight);
-                pdf.save(`Credencial_NDR_${docName}.pdf`);
             });
         });
     }
