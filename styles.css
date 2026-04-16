@@ -307,19 +307,24 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         display: none !important; 
     }
     
-    /* Anulamos totalmente cualquier padding, margen o borde de los contenedores superiores */
-    #id-card-modal, .modal-content, #id-card-preview {
+    /* Convertimos al viewport en la unica caja que ve el navegador para atrapar reboses de diseño */
+    #id-card-modal {
         display: block !important;
         position: absolute !important;
         top: 0 !important;
         left: 0 !important;
-        width: auto !important;
-        height: auto !important;
+        width: 70mm !important;
+        height: 108mm !important;
+        overflow: hidden !important; 
         background: transparent !important;
         margin: 0 !important;
         padding: 0 !important;
-        border: none !important;
-        box-shadow: none !important;
+    }
+
+    .modal-content {
+        display: block !important;
+        position: static !important;
+        margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important;
     }
 
     /* Escondemos la X y el boton de impresion */
@@ -327,23 +332,37 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         display: none !important;
     }
 
-    /* Anclado Supremo al lienzo fisico. 
-       El tamaño se ancla exactamente al tamaño provisto por @page */
-    .id-card {
-        position: fixed !important;
+    #id-card-preview {
+        display: block !important;
+        position: absolute !important;
         top: 0 !important;
         left: 0 !important;
         width: 70mm !important;
         height: 108mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Retenemos la geometría EXACTA de Pixeles para que las Fotos y Textos (que estan en pixeles) 
+       tengan el mismo espacio de respiración que en la previsualización web. */
+    .id-card {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 280px !important;
+        height: 432px !important;
         max-width: none !important;
         max-height: none !important;
         margin: 0 !important;
-        /* Padding milimétrico proporcional a los paddings originales de px */
-        padding: 10mm 5mm 5mm 5mm !important; 
+        padding: 40px 20px 20px 20px !important; 
         box-shadow: none !important;
         page-break-inside: avoid;
         page-break-after: avoid;
-        transform: none !important; 
+        
+        /* Reducimos visualmente este super bloque de 280px para que encaje 
+           exactamente en la mirilla de 70mm (264px) del #id-card-preview */
+        transform: scale(0.944) !important; 
+        transform-origin: top left !important;
     }
 
     .id-card-content {
@@ -352,6 +371,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         box-sizing: border-box !important;
         background: transparent !important;
         margin: 0 !important;
+        padding: 8px !important; /* Explicit padding for content reset */
     }
 
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
