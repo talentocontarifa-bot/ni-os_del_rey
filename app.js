@@ -36,6 +36,9 @@ function renderSiblingsDropdown() {
         if (currentEditId === key) return;
         
         const kid = kidsDataMap[key];
+        // Solo alumnos pueden ser hermanos (según la lógica actual)
+        if (kid.tipoPersona === 'maestro') return;
+
         const ageGrp = getAgeAndGroup(kid.fechaNacimiento).group;
         const opt = document.createElement('option');
         opt.value = key; // ID en firebase
@@ -43,6 +46,36 @@ function renderSiblingsDropdown() {
         
         if (currentlySelected.includes(key)) opt.selected = true;
         selectElem.appendChild(opt);
+    });
+}
+
+function renderMaestrosDropdowns() {
+    const selects = document.querySelectorAll('.master-select');
+    if (!selects.length) return;
+
+    // Preservar selecciones
+    const selections = {};
+    selects.forEach(s => selections[s.id] = s.value);
+
+    // Populate
+    selects.forEach(select => {
+        const isAux = select.id.includes('aux');
+        select.innerHTML = isAux ? '<option value="">-- Ninguno --</option>' : '<option value="">-- Seleccionar --</option>';
+        
+        Object.keys(kidsDataMap).forEach(key => {
+            const person = kidsDataMap[key];
+            if (person.tipoPersona === 'maestro') {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.textContent = person.nombreCompleto;
+                select.appendChild(opt);
+            }
+        });
+        
+        // Restaurar
+        if (selections[select.id]) {
+            select.value = selections[select.id];
+        }
     });
 }
 
@@ -515,8 +548,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply visual filtering logic 
         applyDirectoryFilter();
 
-        // Renderizar o refrescar el selector de familia
+        // Renderizar o refrescar el selector de familia y maestros
         renderSiblingsDropdown();
+        renderMaestrosDropdowns();
         attachCardEvents();
     }, (error) => {
         console.warn("Base de datos sin conexión activa, mostrando dummies.", error);
@@ -661,5 +695,99 @@ document.addEventListener('DOMContentLoaded', () => {
     const infoModal = document.getElementById('info-modal');
     document.querySelector('.close-modal-info').addEventListener('click', () => infoModal.classList.remove('active'));
     infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.classList.remove('active'); });
+
+    // === 3. LÓGICA DE ROLES (ASISTENCIA) ===
+    const rolesForm = document.getElementById('roles-form');
+    if (rolesForm) {
+        rolesForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = rolesForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+            submitBtn.disabled = true;
+
+            try {
+                const dataToSave = {
+                    fecha: document.getElementById('rol-fecha').value,
+                    gpo1: {
+                        titular: document.getElementById('gpo1-titular').value,
+                        auxiliar: document.getElementById('gpo1-aux').value,
+                        link: document.getElementById('gpo1-link').value
+                    },
+                    gpo2: {
+                        titular: document.getElementById('gpo2-titular').value,
+                        auxiliar: document.getElementById('gpo2-aux').value,
+                        link: document.getElementById('gpo2-link').value
+                    },
+                    gpo3: {
+                        titular: document.getElementById('gpo3-titular').value,
+                        auxiliar: document.getElementById('gpo3-aux').value,
+                        link: document.getElementById('gpo3-link').value
+                    },
+                    fechaRegistro: new Date()
+                };
+
+                // Asumimos que podemos usar doc con ID de fecha para actualizar un rol del mismo día si ya existe, si la API firestore falla, creamos uno nuevo.
+                // Firebase-config addDoc y doc/updateDoc fueron importados.
+                await updateDoc(doc(db, "roles_semanales", dataToSave.fecha), dataToSave).catch(async () => {
+                   await addDoc(collection(db, "roles_semanales"), dataToSave); 
+                });
+                alert("Roles guardados exitosamente.");
+                rolesForm.reset();
+            } catch (error) {
+                console.error("Error guardando rol", error);
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    const rolesList = document.getElementById('roles-list');
+    if (rolesList) {
+        onSnapshot(collection(db, "roles_semanales"), (snapshot) => {
+            rolesList.innerHTML = '';
+            if (snapshot.empty) {
+                rolesList.innerHTML = '<div style="text-align:center; padding: 20px; color:#666; font-family: var(--font-body);">No hay roles publicados aún.</div>';
+                return;
+            }
+
+            const rolesArr = [];
+            snapshot.forEach(doc => rolesArr.push({id: doc.id, ...doc.data()}));
+            // Sort by date DESC
+            rolesArr.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+            rolesArr.forEach(rol => {
+                const formatRef = (id) => kidsDataMap[id] ? kidsDataMap[id].nombreCompleto : 'Sin Asignar';
+                
+                const renderGpoRow = (label, gpoData, color) => {
+                    if (!gpoData || !gpoData.titular) return '';
+                    const auxName = gpoData.auxiliar ? formatRef(gpoData.auxiliar) : '';
+                    return `
+                        <div style="border-bottom: 2px dashed #cbd5e1; padding-bottom: 10px; margin-bottom: 10px;">
+                            <strong style="color: ${color}; font-size:1.1rem; font-family: var(--font-heading);">${label}</strong>
+                            <div style="margin-top: 5px; font-family: var(--font-body);"><strong>Titular:</strong> ${formatRef(gpoData.titular)}</div>
+                            ${auxName ? `<div style="font-family: var(--font-body);"><strong>Auxiliar:</strong> ${auxName}</div>` : ''}
+                            ${gpoData.link ? `<div style="font-family: var(--font-body); margin-top:5px;"><a href="${gpoData.link}" target="_blank" class="btn btn-sm" style="background:#f1f5f9; color:#0f172a;"><i class="fa-solid fa-link"></i> Ver Clase / Enlace</a></div>` : ''}
+                        </div>
+                    `;
+                };
+
+                const cardHtml = `
+                    <div class="sketchy-box" style="padding: 20px; background: #fffcf0;">
+                        <h3 style="margin-top:0; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; font-family: var(--font-heading);">
+                            <i class="fa-regular fa-calendar-check" style="color:var(--primary-orange);"></i> Domingo, ${rol.fecha}
+                        </h3>
+                        <div style="display:flex; flex-direction:column; gap: 5px; margin-top:15px;">
+                            ${renderGpoRow('Grupo 1 (0-2 años)', rol.gpo1, '#ec4899')}
+                            ${renderGpoRow('Grupo 2 (3-8 años)', rol.gpo2, '#10b981')}
+                            ${renderGpoRow('Grupo 3 (9-11 años)', rol.gpo3, '#3b82f6')}
+                        </div>
+                    </div>
+                `;
+                rolesList.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        });
+    }
 
 });

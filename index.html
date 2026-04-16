@@ -166,34 +166,34 @@
                             <div class="input-group">
                                 <div class="input-field radio-group">
                                     <label>¿Está bautizado?</label>
-                                    <div class="radio-options">
+                                    <div class="radio-options sketchy-input" style="display:flex; justify-content:space-around;">
                                         <label><input type="radio" name="bautizado" value="si"> Sí</label>
                                         <label><input type="radio" name="bautizado" value="no" checked> No</label>
                                     </div>
                                 </div>
                                 <div class="input-field radio-group">
                                     <label>¿Tomó Sanidad Interior?</label>
-                                    <div class="radio-options">
+                                    <div class="radio-options sketchy-input" style="display:flex; justify-content:space-around;">
                                         <label><input type="radio" name="sanidad" value="si"> Sí</label>
                                         <label><input type="radio" name="sanidad" value="no" checked> No</label>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="input-group" style="margin-top:15px; background: #fffcf0; padding:10px; border-radius:10px; border:2px dashed var(--border-color);">
+                            <div class="input-group sketchy-box" style="margin-top:15px; padding:15px;">
                                 <div class="input-field radio-group" style="width: 100%;">
                                     <label>¿Tomó Vida Discipular?</label>
-                                    <div class="radio-options" style="margin-bottom: 10px;">
+                                    <div class="radio-options" style="margin-bottom: 10px; display:flex; gap:20px;">
                                         <label><input type="radio" name="vidadiscipular" value="si" id="vd-si"> Sí</label>
                                         <label><input type="radio" name="vidadiscipular" value="no" id="vd-no" checked> No</label>
                                     </div>
-                                    <div id="niveles-vd" style="display:none; transition: all 0.3s;">
-                                        <label style="font-size: 0.9rem; margin-bottom: 5px;">¿Qué niveles ha completado?</label>
-                                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                                            <label><input type="checkbox" class="vd-nivel" value="1"> Nivel 1</label>
-                                            <label><input type="checkbox" class="vd-nivel" value="2"> Nivel 2</label>
-                                            <label><input type="checkbox" class="vd-nivel" value="3"> Nivel 3</label>
-                                            <label><input type="checkbox" class="vd-nivel" value="4"> Nivel 4</label>
+                                    <div id="niveles-vd" style="display:none; transition: all 0.3s; margin-top: 10px; border-top: 2px dashed var(--border-color); padding-top: 10px;">
+                                        <label style="font-size: 0.9rem; margin-bottom: 10px; display:block; font-weight:bold;">¿Qué niveles ha completado?</label>
+                                        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                                            <label style="background:#fff; border:2px solid var(--border-color); padding:5px 10px; border-radius:10px;"><input type="checkbox" class="vd-nivel" value="1"> Nivel 1</label>
+                                            <label style="background:#fff; border:2px solid var(--border-color); padding:5px 10px; border-radius:10px;"><input type="checkbox" class="vd-nivel" value="2"> Nivel 2</label>
+                                            <label style="background:#fff; border:2px solid var(--border-color); padding:5px 10px; border-radius:10px;"><input type="checkbox" class="vd-nivel" value="3"> Nivel 3</label>
+                                            <label style="background:#fff; border:2px solid var(--border-color); padding:5px 10px; border-radius:10px;"><input type="checkbox" class="vd-nivel" value="4"> Nivel 4</label>
                                         </div>
                                     </div>
                                 </div>
@@ -258,16 +258,90 @@
                 </div>
             </section>
 
-            <!-- View: Asistencia (Placeholder for now) -->
+            <!-- View: Asistencia/Roles -->
             <section id="view-asistencia" class="view">
-                <header class="view-header">
-                    <h2 style="color:var(--text-color);"><i class="fa-solid fa-calendar-check"></i> Asistencia Diaria</h2>
-                    <p>Módulo de pase de lista interactivo (Próximamente)</p>
+                <header class="view-header purple-header">
+                    <h2><i class="fa-solid fa-calendar-check"></i> Roles de Maestros</h2>
                 </header>
-                <div class="construction-box sketchy-box">
-                    <i class="fa-solid fa-person-digging" style="font-size: 3rem; color: #ffb700;"></i>
-                    <h3>Construyendo el Pizarrón</h3>
-                    <p>Aquí pondremos la vista de tarjetas para el pase de lista dinámico.</p>
+
+                <div class="sketchy-box" style="padding: 20px; margin-bottom: 30px;">
+                    <form id="roles-form">
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label>Selecciona la Fecha del Domingo</label>
+                                <input type="date" id="rol-fecha" class="sketchy-input" required>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:20px; font-weight:bold; font-size:1.2rem; margin-bottom:10px;">Asignaciones por Grupo</div>
+                        
+                        <!-- GPO 1 -->
+                        <div class="sketchy-box" style="padding:15px; margin-bottom: 15px; background: #fffcf0;">
+                            <h4 style="margin: 0 0 10px 0; color: #ec4899;"><i class="fa-solid fa-baby"></i> Grupo 1 (0-2 años)</h4>
+                            <div class="input-group">
+                                <div class="input-field">
+                                    <label>Maestro Titular</label>
+                                    <select id="gpo1-titular" class="sketchy-input master-select"><option value="">-- Seleccionar --</option></select>
+                                </div>
+                                <div class="input-field">
+                                    <label>Auxiliar</label>
+                                    <select id="gpo1-aux" class="sketchy-input master-select"><option value="">-- Ninguno --</option></select>
+                                </div>
+                                <div class="input-field">
+                                    <label>Clase/Link (Opcional)</label>
+                                    <input type="text" id="gpo1-link" class="sketchy-input" placeholder="URL o Tema">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GPO 2 -->
+                        <div class="sketchy-box" style="padding:15px; margin-bottom: 15px; background: #fffcf0;">
+                            <h4 style="margin: 0 0 10px 0; color: #10b981;"><i class="fa-solid fa-child"></i> Grupo 2 (3-8 años)</h4>
+                            <div class="input-group">
+                                <div class="input-field">
+                                    <label>Maestro Titular</label>
+                                    <select id="gpo2-titular" class="sketchy-input master-select"><option value="">-- Seleccionar --</option></select>
+                                </div>
+                                <div class="input-field">
+                                    <label>Auxiliar</label>
+                                    <select id="gpo2-aux" class="sketchy-input master-select"><option value="">-- Ninguno --</option></select>
+                                </div>
+                                <div class="input-field">
+                                    <label>Clase/Link (Opcional)</label>
+                                    <input type="text" id="gpo2-link" class="sketchy-input" placeholder="URL o Tema">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GPO 3 -->
+                        <div class="sketchy-box" style="padding:15px; margin-bottom: 15px; background: #fffcf0;">
+                            <h4 style="margin: 0 0 10px 0; color: #3b82f6;"><i class="fa-solid fa-child-reaching"></i> Grupo 3 (9-11 años)</h4>
+                            <div class="input-group">
+                                <div class="input-field">
+                                    <label>Maestro Titular</label>
+                                    <select id="gpo3-titular" class="sketchy-input master-select"><option value="">-- Seleccionar --</option></select>
+                                </div>
+                                <div class="input-field">
+                                    <label>Auxiliar</label>
+                                    <select id="gpo3-aux" class="sketchy-input master-select"><option value="">-- Ninguno --</option></select>
+                                </div>
+                                <div class="input-field">
+                                    <label>Clase/Link (Opcional)</label>
+                                    <input type="text" id="gpo3-link" class="sketchy-input" placeholder="URL o Tema">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-green"><i class="fa-solid fa-floppy-disk"></i> Guardar Roles</button>
+                        </div>
+                    </form>
+                </div>
+
+                <h3>Roles Publicados</h3>
+                <div id="roles-list" style="display:flex; flex-direction:column; gap:20px; margin-top:20px;">
+                    <!-- JS fills this -->
+                    <div style="text-align:center; padding: 20px; color:#666;">Cargando...</div>
                 </div>
             </section>
 
