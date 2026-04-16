@@ -708,7 +708,24 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.close-modal-info').addEventListener('click', () => infoModal.classList.remove('active'));
     infoModal.addEventListener('click', (e) => { if (e.target === infoModal) infoModal.classList.remove('active'); });
 
-    // === 3. LÓGICA DE ROLES (ASISTENCIA) ===
+    // === 3. LÓGICA DE ROLES (CALENDARIO) ===
+    let calendarDate = new Date();
+    window.rolesMapData = {}; // Guardar roles indexados por fecha (YYYY-MM-DD)
+
+    const btnNewRol = document.getElementById('btn-new-rol');
+    const rolFormModal = document.getElementById('rol-form-modal');
+    const btnCloseRolForm = document.querySelector('.close-rol-form');
+    
+    // Abrir form de roles
+    btnNewRol.addEventListener('click', () => {
+        document.getElementById('roles-form').reset();
+        rolFormModal.classList.add('active');
+    });
+
+    btnCloseRolForm.addEventListener('click', () => rolFormModal.classList.remove('active'));
+    rolFormModal.addEventListener('click', (e) => { if (e.target === rolFormModal) rolFormModal.classList.remove('active'); });
+
+    // Guardado de form
     const rolesForm = document.getElementById('roles-form');
     if (rolesForm) {
         rolesForm.addEventListener('submit', async (e) => {
@@ -719,8 +736,9 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
+                const fechaSeleccionada = document.getElementById('rol-fecha').value;
                 const dataToSave = {
-                    fecha: document.getElementById('rol-fecha').value,
+                    fecha: fechaSeleccionada,
                     gpo1: {
                         titular: document.getElementById('gpo1-titular').value,
                         auxiliar: document.getElementById('gpo1-aux').value,
@@ -736,16 +754,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         auxiliar: document.getElementById('gpo3-aux').value,
                         link: document.getElementById('gpo3-link').value
                     },
-                    fechaRegistro: new Date()
+                    fechaRegistro: new Date().toISOString()
                 };
 
-                // Asumimos que podemos usar doc con ID de fecha para actualizar un rol del mismo día si ya existe, si la API firestore falla, creamos uno nuevo.
-                // Firebase-config addDoc y doc/updateDoc fueron importados.
-                await updateDoc(doc(db, "roles_semanales", dataToSave.fecha), dataToSave).catch(async () => {
-                   await addDoc(collection(db, "roles_semanales"), dataToSave); 
-                });
+                const existingRol = window.rolesMapData[fechaSeleccionada];
+                if (existingRol && existingRol.id) {
+                    await updateDoc(doc(db, "roles_semanales", existingRol.id), dataToSave);
+                } else {
+                    await addDoc(collection(db, "roles_semanales"), dataToSave);
+                }
+
                 alert("Roles guardados exitosamente.");
                 rolesForm.reset();
+                rolFormModal.classList.remove('active');
+                document.getElementById('rol-detail-modal').classList.remove('active'); // en caso de que viniera de editar
             } catch (error) {
                 console.error("Error guardando rol", error);
             } finally {
@@ -755,51 +777,149 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const rolesList = document.getElementById('roles-list');
-    if (rolesList) {
+    // Modal de Detalles del Rol
+    const rolDetailModal = document.getElementById('rol-detail-modal');
+    document.querySelector('.close-rol-detail').addEventListener('click', () => rolDetailModal.classList.remove('active'));
+    rolDetailModal.addEventListener('click', (e) => { if (e.target === rolDetailModal) rolDetailModal.classList.remove('active'); });
+
+    document.getElementById('btn-edit-rol-modal').addEventListener('click', () => {
+        const currentFecha = document.getElementById('btn-edit-rol-modal').dataset.fecha;
+        if(currentFecha && window.rolesMapData[currentFecha]) {
+            const data = window.rolesMapData[currentFecha];
+            document.getElementById('rol-fecha').value = data.fecha;
+            
+            document.getElementById('gpo1-titular').value = data.gpo1.titular || "";
+            document.getElementById('gpo1-aux').value = data.gpo1.auxiliar || "";
+            document.getElementById('gpo1-link').value = data.gpo1.link || "";
+
+            document.getElementById('gpo2-titular').value = data.gpo2.titular || "";
+            document.getElementById('gpo2-aux').value = data.gpo2.auxiliar || "";
+            document.getElementById('gpo2-link').value = data.gpo2.link || "";
+
+            document.getElementById('gpo3-titular').value = data.gpo3.titular || "";
+            document.getElementById('gpo3-aux').value = data.gpo3.auxiliar || "";
+            document.getElementById('gpo3-link').value = data.gpo3.link || "";
+
+            rolDetailModal.classList.remove('active');
+            rolFormModal.classList.add('active');
+        }
+    });
+
+    // Escucha en Tiempo Real - Actualiza Calendario
+    const rolesCalendar = document.getElementById('roles-calendar');
+    if (rolesCalendar) {
         onSnapshot(collection(db, "roles_semanales"), (snapshot) => {
-            rolesList.innerHTML = '';
-            if (snapshot.empty) {
-                rolesList.innerHTML = '<div style="text-align:center; padding: 20px; color:#666; font-family: var(--font-body);">No hay roles publicados aún.</div>';
-                return;
-            }
-
-            const rolesArr = [];
-            snapshot.forEach(doc => rolesArr.push({id: doc.id, ...doc.data()}));
-            // Sort by date DESC
-            rolesArr.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-
-            rolesArr.forEach(rol => {
-                const formatRef = (id) => kidsDataMap[id] ? kidsDataMap[id].nombreCompleto : 'Sin Asignar';
-                
-                const renderGpoRow = (label, gpoData, color) => {
-                    if (!gpoData || !gpoData.titular) return '';
-                    const auxName = gpoData.auxiliar ? formatRef(gpoData.auxiliar) : '';
-                    return `
-                        <div style="border-bottom: 2px dashed #cbd5e1; padding-bottom: 10px; margin-bottom: 10px;">
-                            <strong style="color: ${color}; font-size:1.1rem; font-family: var(--font-heading);">${label}</strong>
-                            <div style="margin-top: 5px; font-family: var(--font-body);"><strong>Titular:</strong> ${formatRef(gpoData.titular)}</div>
-                            ${auxName ? `<div style="font-family: var(--font-body);"><strong>Auxiliar:</strong> ${auxName}</div>` : ''}
-                            ${gpoData.link ? `<div style="font-family: var(--font-body); margin-top:5px;"><a href="${gpoData.link}" target="_blank" class="btn btn-sm" style="background:#f1f5f9; color:#0f172a;"><i class="fa-solid fa-link"></i> Ver Clase / Enlace</a></div>` : ''}
-                        </div>
-                    `;
-                };
-
-                const cardHtml = `
-                    <div class="sketchy-box" style="padding: 20px; background: #fffcf0;">
-                        <h3 style="margin-top:0; border-bottom: 3px solid var(--border-color); padding-bottom: 10px; font-family: var(--font-heading);">
-                            <i class="fa-regular fa-calendar-check" style="color:var(--primary-orange);"></i> Domingo, ${rol.fecha}
-                        </h3>
-                        <div style="display:flex; flex-direction:column; gap: 5px; margin-top:15px;">
-                            ${renderGpoRow('Grupo 1 (0-2 años)', rol.gpo1, '#ec4899')}
-                            ${renderGpoRow('Grupo 2 (3-8 años)', rol.gpo2, '#10b981')}
-                            ${renderGpoRow('Grupo 3 (9-11 años)', rol.gpo3, '#3b82f6')}
-                        </div>
-                    </div>
-                `;
-                rolesList.insertAdjacentHTML('beforeend', cardHtml);
+            window.rolesMapData = {};
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                window.rolesMapData[data.fecha] = { id: doc.id, ...data };
             });
+            renderCalendar();
         });
     }
+
+    function renderCalendar() {
+        const calendarGrid = document.getElementById('roles-calendar');
+        if (!calendarGrid) return;
+        
+        const year = calendarDate.getFullYear();
+        const month = calendarDate.getMonth(); // 0-11
+        
+        // Mes Titulo
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        document.getElementById('cal-month-title').innerText = `${monthNames[month]} ${year}`;
+
+        // Header Semanas
+        calendarGrid.innerHTML = `
+            <div class="cal-header-day">Do</div>
+            <div class="cal-header-day">Lu</div>
+            <div class="cal-header-day">Ma</div>
+            <div class="cal-header-day">Mi</div>
+            <div class="cal-header-day">Ju</div>
+            <div class="cal-header-day">Vi</div>
+            <div class="cal-header-day">Sa</div>
+        `;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Padding vacios inicio
+        for (let i = 0; i < firstDay; i++) {
+            calendarGrid.insertAdjacentHTML('beforeend', `<div class="cal-day empty"></div>`);
+        }
+
+        // Dias del mes
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            const isSunday = new Date(year, month, i).getDay() === 0;
+            const rolData = window.rolesMapData[dateStr];
+            
+            let dayHtml = document.createElement('div');
+            dayHtml.className = `cal-day ${rolData ? 'has-rol' : ''}`;
+            dayHtml.innerHTML = `<span style="border-radius:50%; width:28px; height:28px; text-align:center; line-height:28px; ${isSunday && !rolData ? 'background:#fee2e2; color:#ef4444;' : ''}">${i}</span>`;
+            
+            if (rolData) {
+                dayHtml.addEventListener('click', () => showRolDetail(dateStr));
+            } else if (isSunday) {
+                // Dominicales vacios
+                dayHtml.style.cursor = 'pointer';
+                dayHtml.title = "Haz clic para añadir rol a este domingo";
+                dayHtml.addEventListener('click', () => {
+                    document.getElementById('roles-form').reset();
+                    document.getElementById('rol-fecha').value = dateStr;
+                    rolFormModal.classList.add('active');
+                });
+            }
+
+            calendarGrid.appendChild(dayHtml);
+        }
+    }
+
+    function showRolDetail(fechaStr) {
+        const rol = window.rolesMapData[fechaStr];
+        if (!rol) return;
+
+        const formatRef = (id) => kidsDataMap[id] ? kidsDataMap[id].nombreCompleto : 'Sin Asignar';
+        const renderGpoRow = (label, gpoData, color) => {
+            if (!gpoData || !gpoData.titular) return '';
+            const auxName = gpoData.auxiliar ? formatRef(gpoData.auxiliar) : '';
+            return `
+                <div style="border-bottom: 2px dashed #cbd5e1; padding-bottom: 15px; margin-bottom: 15px;">
+                    <strong style="color: ${color}; font-size:1.2rem; font-family: var(--font-heading);"><i class="fa-solid fa-users"></i> ${label}</strong>
+                    <div style="margin-top: 10px; font-family: var(--font-body); font-size:1.1rem;"><strong><i class="fa-solid fa-chalkboard-user"></i> Titular:</strong> ${formatRef(gpoData.titular)}</div>
+                    ${auxName ? `<div style="font-family: var(--font-body); font-size:1.1rem; margin-top:5px;"><strong><i class="fa-solid fa-user-plus"></i> Auxiliar:</strong> ${auxName}</div>` : ''}
+                    ${gpoData.link ? `<div style="font-family: var(--font-body); margin-top:10px;"><a href="${gpoData.link}" target="_blank" class="btn btn-sm" style="background:#f1f5f9; color:#0f172a; width:100%; text-align:center;"><i class="fa-solid fa-cloud-arrow-down"></i> Descargar Clase</a></div>` : ''}
+                </div>
+            `;
+        };
+
+        const fechaObj = new Date(fechaStr + "T00:00:00");
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        
+        const html = `
+            <h2 style="margin-top:0; border-bottom: 4px solid var(--border-color); padding-bottom: 15px; font-family: var(--font-heading); color: var(--primary-purple); text-transform:capitalize;">
+                <i class="fa-regular fa-calendar-check" style="color:var(--primary-orange);"></i> ${fechaObj.toLocaleDateString('es-ES', options)}
+            </h2>
+            <div style="display:flex; flex-direction:column; gap: 5px; margin-top:15px;">
+                ${renderGpoRow('Grupo 1 (0-2 años)', rol.gpo1, '#ec4899')}
+                ${renderGpoRow('Grupo 2 (3-8 años)', rol.gpo2, '#10b981')}
+                ${renderGpoRow('Grupo 3 (9-11 años)', rol.gpo3, '#3b82f6')}
+            </div>
+        `;
+
+        document.getElementById('btn-edit-rol-modal').dataset.fecha = fechaStr;
+        document.getElementById('rol-detail-content').innerHTML = html;
+        rolDetailModal.classList.add('active');
+    }
+
+    // Controles mes anterior / siguiente
+    document.getElementById('cal-prev-month').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() - 1);
+        renderCalendar();
+    });
+    document.getElementById('cal-next-month').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() + 1);
+        renderCalendar();
+    });
 
 });
