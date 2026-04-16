@@ -325,16 +325,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             const opt = {
-                margin:       0, // Regresamos a 0 porque ahora usaremos mm directos con el nuevo template!
+                margin:       0, // Sin margenes
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
                 html2canvas:  { 
                     scale: 4, 
                     useCORS: true, 
-                    backgroundColor: null // null para que no inyecte blanco en los bordes curvos
+                    backgroundColor: null 
                 },
-                // Medidas fisicas especificadas por el cliente: 69.9mm x 108mm (usamos 70x108)
-                jsPDF:        { unit: 'mm', format: [70, 108], orientation: 'portrait' }
+                // Retornamos a unidad PX (pixel-perfect matching) para aniquilar el bug de des-escala de la hoja.
+                // 280x432 px es exactamente proporcional a 70x108 mm. Al imprimirlo saldra inquebrantable.
+                jsPDF:        { unit: 'px', format: [280, 432], orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(cardElement).save().then(() => {
