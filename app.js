@@ -365,9 +365,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const first = parts.shift() || '';
         const last = parts.join(' ') || '';
 
+        // Ajuste dinámico de fuente y foto para nombres largos
+        const nameLen = data.nombreCompleto ? data.nombreCompleto.length : 0;
+        let nameStyle = "";
+        let photoSizeStyle = "";
+        if (nameLen > 22) {
+            nameStyle = "font-size: 1.2rem; line-height: 1; margin: 0;";
+            photoSizeStyle = "width: 125px; height: 125px; margin-bottom: 4px;";
+        } else if (nameLen > 14) {
+            nameStyle = "font-size: 1.45rem; line-height: 1; margin: 0;";
+            photoSizeStyle = "width: 140px; height: 140px; margin-bottom: 6px;";
+        }
+
         let sisText = '';
         if (data.hermanosVinculados && data.hermanosVinculados.length > 0) {
-            const nombresHerms = data.hermanosVinculados.map(hid => kidsDataMap[hid] ? kidsDataMap[hid].nombreCompleto : '...').join(', ');
+            const nombresHerms = data.hermanosVinculados.map(hid => kidsDataMap[hid] ? kidsDataMap[hid].nombreCompleto.split(' ')[0] : '...').join(', ');
             sisText = `
                 <div class="id-siblings-box">
                     <i class="fa-solid fa-children"></i> 
@@ -382,11 +394,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="id-card-content" style="padding: 8px;">
                     <img src="logo.webp" class="id-logo" alt="Niños del Rey">
                     
-                    <div class="id-photo-container">
+                    <div class="id-photo-container" style="${photoSizeStyle}">
                         <img src="${avatar}" class="id-photo" alt="Foto">
                     </div>
                     
-                    <h3 class="id-name"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
+                    <h3 class="id-name" style="${nameStyle}"><span class="firstname">${first}</span> <span class="lastname">${last}</span></h3>
                     <p class="id-number">ID: ${data.idAuto || 'S/N'}</p>
                     <p class="id-age-gpo">${age} años &bull; ${group}</p>
                     
