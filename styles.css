@@ -291,6 +291,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         background: white !important;
         width: 70mm !important;
         height: 108mm !important;
+        overflow: hidden !important; /* Forzar estrangulamiento de reboses */
     }
 
     /* Colapsamos ABSOLUTAMENTE TODO el resto del DOM para que no arroje paginas vacias */
@@ -331,7 +332,9 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         box-shadow: none !important;
         page-break-inside: avoid;
         page-break-after: avoid;
-        transform: scale(1) !important; 
+        /* La magia: 280px miden fisicamente 74mm. Para que entren en la hoja @page de 70mm sin rebosar 
+           a las paginas 2 y 3, reducimos el contenedor entero al 94.4% de su tamaño exacto. */
+        transform: scale(0.944) !important; 
         transform-origin: top left !important;
     }
 
