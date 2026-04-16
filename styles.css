@@ -382,3 +382,69 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         margin: 0mm;
     }
 }
+
+/* Calendario Grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    font-family: var(--font-body);
+}
+
+.cal-header-day {
+    text-align: center;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--primary-purple);
+    padding: 10px 0;
+    border-bottom: 3px solid var(--border-color);
+}
+
+.cal-day {
+    background: #fff;
+    border: 3px solid var(--border-color);
+    border-radius: 12px;
+    height: 80px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-end;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #333;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+    cursor: default;
+}
+
+.cal-day.empty {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.cal-day.has-rol {
+    background: #facc15; /* orange-yellow */
+    cursor: pointer;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+}
+
+.cal-day.has-rol:hover {
+    transform: translateY(-2px);
+    box-shadow: 4px 6px 0px rgba(0,0,0,0.15);
+}
+
+.cal-day.has-rol::after {
+    content: '★ Rol';
+    display: block;
+    font-size: 0.8rem;
+    width: 100%;
+    text-align: center;
+    background: var(--primary-orange);
+    color: white;
+    border-radius: 8px;
+    padding: 2px 0;
+    margin-top: auto;
+    border: 2px solid var(--border-color);
+}
