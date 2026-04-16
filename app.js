@@ -325,17 +325,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             const opt = {
-                margin:       [-2, -2, -2, -2], // Sangria negativa (bleed) para guillotinar el marco blanco
+                margin:       0, // Regresamos a 0 porque ahora usaremos mm directos con el nuevo template!
                 filename:     `Credencial_NDR_${docName}.pdf`,
                 image:        { type: 'jpeg', quality: 1 },
-                // scale 4 para ultra definicion
                 html2canvas:  { 
                     scale: 4, 
                     useCORS: true, 
-                    backgroundColor: '#ffffff'
+                    backgroundColor: null // null para que no inyecte blanco en los bordes curvos
                 },
-                // Reducimos el lienzo 4 pixeles exactos para que la imagen se estire 2px hacia afuera en cada lado
-                jsPDF:        { unit: 'px', format: [276, 368], orientation: 'portrait' }
+                // Medidas fisicas especificadas por el cliente: 69.9mm x 108mm (usamos 70x108)
+                jsPDF:        { unit: 'mm', format: [70, 108], orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(cardElement).save().then(() => {
