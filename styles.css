@@ -313,32 +313,33 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         background: white !important;
     }
 
-    /* Mantenemos estrictamente los px del diseño de escritorio para que NO se descuadre internamente. 
-       250px son ~66.1mm, lo cual entra perfectamente en la hoja de 70mm. */
+    /* Mantenemos estrictamente los px del diseño de escritorio (70x108mm = 280x432px)*/
     .id-card {
-        width: 250px !important;
-        height: 350px !important;
+        width: 280px !important;
+        height: 432px !important;
         max-width: none !important;
         max-height: none !important;
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 40px 20px 20px 20px !important; /* Mismo margen que UI web */
         box-shadow: none !important;
         page-break-inside: avoid;
-        transform: scale(0.98) !important; /* Ligera reduccion para el margen de seguridad de impresoras */
-        transform-origin: center center !important;
+        transform: scale(1) !important; 
+        transform-origin: top left !important;
     }
 
     .id-card-content {
         width: 100% !important;
         height: 100% !important;
         box-sizing: border-box !important;
+        background: transparent !important;
         margin: 0 !important;
     }
 
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
+    /* Medidas matematicas exactas que tomará la bandeja de impresión */
     @page {
-        size: 70mm 93mm;
+        size: 70mm 108mm;
         margin: 0mm;
     }
 }
