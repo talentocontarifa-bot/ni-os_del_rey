@@ -289,28 +289,35 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         margin: 0 !important;
         padding: 0 !important;
         background: white !important;
+        width: 70mm !important;
+        height: 108mm !important;
     }
 
-    body * { visibility: hidden !important; }
+    /* Colapsamos ABSOLUTAMENTE TODO el resto del DOM para que no arroje paginas vacias */
+    body > *:not(#id-card-modal) { 
+        display: none !important; 
+    }
     
-    #id-card-preview, #id-card-preview * {
-        visibility: visible !important;
-    }
-
-    /* Anclamos el contenedor principal al limite exacto de la pagina impresa */
-    #id-card-preview {
-        position: fixed !important;
+    #id-card-modal {
+        display: block !important;
+        position: absolute !important;
         top: 0 !important;
         left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
+        background: white !important;
         margin: 0 !important;
         padding: 0 !important;
-        z-index: 999999 !important;
-        background: white !important;
+    }
+
+    /* Escondemos la X y el boton de impresion */
+    .close-modal, .modal-actions {
+        display: none !important;
+    }
+
+    #id-card-preview {
+        display: block !important;
+        position: static !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     /* Mantenemos estrictamente los px del diseño de escritorio (70x108mm = 280x432px)*/
@@ -323,6 +330,7 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: normal; }
         padding: 40px 20px 20px 20px !important; /* Mismo margen que UI web */
         box-shadow: none !important;
         page-break-inside: avoid;
+        page-break-after: avoid;
         transform: scale(1) !important; 
         transform-origin: top left !important;
     }
