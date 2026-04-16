@@ -7,7 +7,11 @@
     <!-- FontAwesome para íconos (vía JsDelivr libre de tracking) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=4.0">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=5.0">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" crossorigin="anonymous">
     <!-- Librerías locales para evitar bloqueos Edge Tracking Prevention -->
@@ -32,7 +36,8 @@
             </div>
             
             <ul class="nav-links">
-                <li><a href="#" class="nav-item active" data-target="view-registro"><i class="fa-solid fa-user-plus"></i> Registro</a></li>
+                <li><a href="#" class="nav-item active" data-target="view-home"><i class="fa-solid fa-house"></i> Inicio</a></li>
+                <li><a href="#" class="nav-item focus-ring" data-target="view-registro"><i class="fa-solid fa-user-plus"></i> Registro</a></li>
                 <li><a href="#" class="nav-item focus-ring" data-target="view-directorio"><i class="fa-solid fa-address-book"></i> Directorio</a></li>
                 <li><a href="#" class="nav-item focus-ring" data-target="view-asistencia"><i class="fa-solid fa-calendar-days"></i> Roles</a></li>
             </ul>
@@ -41,8 +46,24 @@
         <!-- Main Content -->
         <main class="main-content">
             
+            <!-- View: Home -->
+            <section id="view-home" class="view active" style="display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding: 40px 20px; min-height:100%;">
+                <img src="logo.webp" alt="Niños del Rey" style="max-width: 250px; margin-bottom: 20px; filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.1));">
+                <h1 style="color: var(--primary-purple); font-size: 2.5rem; margin-bottom: 20px;"><i class="fa-solid fa-crown"></i> Niños del Rey</h1>
+                <div class="sketchy-box" style="padding: 20px 30px; margin-bottom: 40px; background: #fffcf0; max-width: 600px; transform: rotate(-1deg);">
+                    <p style="font-size: 1.3rem; margin: 0; color: #555; line-height: 1.6; font-weight:700;">
+                        "Servimos con pasión y con excelencia por extender el Reino de Dios en los pequeños."
+                    </p>
+                </div>
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                    <button class="btn btn-blue nav-item-btn" data-target="view-registro" style="font-size: 1.2rem; padding: 15px 30px;"><i class="fa-solid fa-user-plus"></i> Registrar</button>
+                    <button class="btn btn-green nav-item-btn" data-target="view-directorio" style="font-size: 1.2rem; padding: 15px 30px;"><i class="fa-solid fa-address-book"></i> Directorio</button>
+                    <button class="btn btn-orange nav-item-btn" data-target="view-asistencia" style="font-size: 1.2rem; padding: 15px 30px;"><i class="fa-solid fa-calendar-days"></i> Roles</button>
+                </div>
+            </section>
+
             <!-- View: Registro -->
-            <section id="view-registro" class="view active">
+            <section id="view-registro" class="view">
                 <header class="view-header purple-header">
                     <h2><i class="fa-solid fa-child-reaching"></i> Registro de Nuevo Niño</h2>
                 </header>

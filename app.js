@@ -103,6 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    document.querySelectorAll('.nav-item-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchView(btn.getAttribute('data-target'));
+        });
+    });
+
     // === PREVISUALIZACIÓN DE FOTO ===
     const photoPreview = document.getElementById('photo-preview');
     const photoInput = document.getElementById('kid-photo');
