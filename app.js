@@ -198,20 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Toggle de Niveles Vida Discipular
-    const radiosVd = document.querySelectorAll('input[name="vidadiscipular"]');
-    const panelNivelesVd = document.getElementById('niveles-vd');
-    radiosVd.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if(e.target.value === 'si') {
-                panelNivelesVd.style.display = 'block';
-            } else {
-                panelNivelesVd.style.display = 'none';
-                // Reset checks
-                document.querySelectorAll('.vd-nivel').forEach(cb => cb.checked = false);
-            }
-        });
-    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -247,16 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const celular = document.getElementById('reg-celular').value || "";
                 const correo = document.getElementById('reg-correo').value || "";
                 const estadoCivil = document.getElementById('reg-estadocivil').value;
-                const bautizado = form.querySelector('input[name="bautizado"]:checked').value;
-                const sanidad = form.querySelector('input[name="sanidad"]:checked').value;
-                const vdData = form.querySelector('input[name="vidadiscipular"]:checked').value;
                 
-                let vdNiveles = [];
-                if (vdData === 'si') {
-                    vdNiveles = Array.from(document.querySelectorAll('.vd-nivel:checked')).map(cb => cb.value);
-                }
-                
-                dataToSave = { ...dataToSave, celular, correo, estadoCivil, bautizado, sanidadInterior: sanidad, vidaDiscipular: vdData, vidaDiscipularNiveles: vdNiveles };
+                dataToSave = { ...dataToSave, celular, correo, estadoCivil };
             }
 
             let photoUrl = null;
@@ -335,16 +313,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.tipoPersona === 'maestro') {
             const { age } = getAgeAndGroup(data.fechaNacimiento);
-            const vdText = data.vidaDiscipular === 'si' ? `Sí (Niveles: ${data.vidaDiscipularNiveles ? data.vidaDiscipularNiveles.join(', ') : 'Ninguno'})` : 'No';
             bodyHTML = `
             <div style="font-size:1.05rem; line-height:1.6;">
                 <p><strong><i class="fa-solid fa-cake-candles" style="color:#ec4899; width:20px;"></i> Edad:</strong> ${age} años (Nace: ${data.fechaNacimiento || 'N/A'})</p>
                 <p><strong><i class="fa-solid fa-phone" style="color:#10b981; width:20px;"></i> Celular:</strong> <a href="tel:${data.celular}" style="color:#10b981; text-decoration:none; font-weight:700;">${data.celular || 'No registrado'}</a></p>
                 <p><strong><i class="fa-solid fa-envelope" style="color:#3b82f6; width:20px;"></i> Correo:</strong> ${data.correo || 'No registrado'}</p>
                 <p><strong><i class="fa-solid fa-ring" style="color:#f59e0b; width:20px;"></i> Estado Civil:</strong> ${data.estadoCivil || 'N/A'}</p>
-                <p><strong><i class="fa-solid fa-droplet" style="color:#38bdf8; width:20px;"></i> Bautizado:</strong> <span style="text-transform: capitalize;">${data.bautizado || 'N/A'}</span></p>
-                <p><strong><i class="fa-solid fa-book-bible" style="color:#a855f7; width:20px;"></i> Vida Discipular:</strong> ${vdText}</p>
-                <p><strong><i class="fa-solid fa-heart-circle-check" style="color:#f43f5e; width:20px;"></i> Sanidad Interior:</strong> <span style="text-transform: capitalize;">${data.sanidadInterior || 'N/A'}</span></p>
             </div>`;
         } else {
             const { age, group } = getAgeAndGroup(data.fechaNacimiento);
@@ -666,21 +640,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('reg-correo').value = data.correo || "";
                     document.getElementById('reg-estadocivil').value = data.estadoCivil || "Soltero";
                     
-                    if(data.bautizado) form.querySelector(`input[name="bautizado"][value="${data.bautizado}"]`).checked = true;
-                    if(data.sanidadInterior) form.querySelector(`input[name="sanidad"][value="${data.sanidadInterior}"]`).checked = true;
-                    
-                    if(data.vidaDiscipular) {
-                        const vdRadio = form.querySelector(`input[name="vidadiscipular"][value="${data.vidaDiscipular}"]`);
-                        if(vdRadio) {
-                            vdRadio.checked = true;
-                            vdRadio.dispatchEvent(new Event('change'));
-                        }
-                    }
-                    if(data.vidaDiscipularNiveles) {
-                        Array.from(document.querySelectorAll('.vd-nivel')).forEach(cb => {
-                            cb.checked = data.vidaDiscipularNiveles.includes(cb.value);
-                        });
-                    }
                     
                 } else {
                     // Cargar Kid Data
