@@ -232,9 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 const celular = document.getElementById('reg-celular').value || "";
                 const correo = document.getElementById('reg-correo').value || "";
-                const estadoCivil = document.getElementById('reg-estadocivil').value;
                 
-                dataToSave = { ...dataToSave, celular, correo, estadoCivil };
+                dataToSave = { ...dataToSave, celular, correo };
             }
 
             let photoUrl = null;
@@ -318,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p><strong><i class="fa-solid fa-cake-candles" style="color:#ec4899; width:20px;"></i> Edad:</strong> ${age} años (Nace: ${data.fechaNacimiento || 'N/A'})</p>
                 <p><strong><i class="fa-solid fa-phone" style="color:#10b981; width:20px;"></i> Celular:</strong> <a href="tel:${data.celular}" style="color:#10b981; text-decoration:none; font-weight:700;">${data.celular || 'No registrado'}</a></p>
                 <p><strong><i class="fa-solid fa-envelope" style="color:#3b82f6; width:20px;"></i> Correo:</strong> ${data.correo || 'No registrado'}</p>
-                <p><strong><i class="fa-solid fa-ring" style="color:#f59e0b; width:20px;"></i> Estado Civil:</strong> ${data.estadoCivil || 'N/A'}</p>
             </div>`;
         } else {
             const { age, group } = getAgeAndGroup(data.fechaNacimiento);
@@ -638,7 +636,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     document.getElementById('reg-celular').value = data.celular || "";
                     document.getElementById('reg-correo').value = data.correo || "";
-                    document.getElementById('reg-estadocivil').value = data.estadoCivil || "Soltero";
                     
                     
                 } else {
